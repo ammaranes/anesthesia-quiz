@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Saudi Board Anesthesia Practice Suite</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    body { -webkit-tap-highlight-color: transparent; }
+    .safe-top { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 safe-top">
+    <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </button>
+        <div>
+          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[180px] sm:max-w-xs">No Deck Loaded</h1>
+          <p id="deck-progress-text" class="text-xs text-emerald-400">0 / 0 Answered</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="btn-flag" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800">
+          <i data-lucide="bookmark" class="w-5 h-5"></i>
+        </button>
+        <button id="btn-sync-modal" class="p-2 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center">
+          <i data-lucide="cloud" class="w-5 h-5"></i>
+          <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 ml-1.5 hidden"></span>
+        </button>
+      </div>
+    </div>
+    <div class="w-full bg-slate-800 h-1">
+      <div id="progress-bar-fill" class="bg-emerald-500 h-1 w-0 transition-all duration-300"></div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-3xl w-full mx-auto p-4 flex flex-col justify-between">
+    
+    <div id="view-empty" class="my-auto text-center py-12 px-4">
+      <div class="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+        <i data-lucide="file-up" class="w-8 h-8"></i>
+      </div>
+      <h2 class="text-xl font-bold text-slate-100 mb-2">Import Your Study Deck</h2>
+      <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">Upload your Markdown (.md) MCQ files. Everything will automatically sync between your iPhone and iPad.</p>
+      <label class="inline-flex items-center px-5 py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl font-semibold cursor-pointer shadow-lg shadow-blue-600/30 transition">
+        <i data-lucide="upload" class="w-5 h-5 mr-2"></i> Choose .md File
+        <input type="file" id="file-input" accept=".md" class="hidden" />
+      </label>
+    </div>
+
+    <div id="view-quiz" class="hidden flex-1 flex flex-col">
+      <div class="flex items-center justify-between text-xs font-semibold text-slate-400 mb-3">
+        <span id="question-number-badge" class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-md text-slate-300">Question 1</span>
+        <span id="score-badge" class="text-slate-400">Accuracy: 100%</span>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm mb-4">
+        <p id="question-stem" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed"></p>
+      </div>
+
+      <div id="options-container" class="space-y-3 mb-6"></div>
+
+      <div id="explanation-box" class="hidden bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 mb-6 text-sm text-slate-300">
+        <div class="flex items-center text-emerald-400 font-bold mb-2">
+          <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Reference & Rationale
+        </div>
+        <div id="explanation-content" class="leading-relaxed space-y-2"></div>
+      </div>
+    </div>
+
+    <footer id="quiz-footer" class="hidden sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-4 safe-bottom border-t border-slate-800/80">
+      <div class="flex items-center justify-between space-x-3">
+        <button id="btn-prev" class="flex-1 py-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 border border-slate-800 rounded-xl font-semibold text-sm flex items-center justify-center text-slate-300">
+          <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
+        </button>
+        <button id="btn-reveal" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-xl font-semibold text-sm text-slate-200">
+          Reveal
+        </button>
+        <button id="btn-next" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl font-semibold text-sm text-white flex items-center justify-center">
+          Next <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <div id="modal-decks" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 class="font-bold text-slate-100">Your Study Decks</h3>
+        <button id="btn-close-decks" class="p-1 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="deck-list" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
+      <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+        <label class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold text-sm flex items-center justify-center cursor-pointer">
+          <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Import New .md File
+          <input type="file" id="modal-file-input" accept=".md" class="hidden" />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-sync" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2 text-blue-400 font-bold">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+          <span>Cloud Sync Setup</span>
+        </div>
+        <button id="btn-close-sync" class="p-1 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+        Enter the same <b>Sync Passphrase</b> on all your devices (iPhone, iPad, Mac). Your progress, bookmarks, and quiz decks will remain synchronized automatically.
+      </p>
+      <input type="text" id="input-sync-key" placeholder="e.g. AMMAR-STUDY-2026" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 font-mono text-sm uppercase mb-4 focus:border-blue-500 focus:outline-none" />
+      <button id="btn-save-sync" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold text-sm text-white">
+        Connect & Synchronize
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 🔑 FIREBASE CONFIGURATION (PASTE KEYS HERE)
+    // ==========================================
+    const firebaseConfig = {
+  apiKey: "AIzaSyDTBiUKXcQ6i_0qdygn6sEUflFOlERzQOs",
+  authDomain: "qb-sync-e6294.firebaseapp.com",
+  projectId: "qb-sync-e6294",
+  storageBucket: "qb-sync-e6294.firebasestorage.app",
+  messagingSenderId: "94979024020",
+  appId: "1:94979024020:web:687bd4c064b87ff1180081"
+};
+
+    let db = null;
+    let syncUnsubscribe = null;
+
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    }
+
+    // --- State Structure ---
+    let state = {
+      decks: {},           
+      currentDeckId: null,
+      userProgress: {},    
+      syncKey: localStorage.getItem('anesthesia_sync_key') || ''
+    };
+
+    // Load Local Storage Cache
+    const savedDecks = localStorage.getItem('anesthesia_decks');
+    const savedProgress = localStorage.getItem('anesthesia_progress');
+    if (savedDecks) state.decks = JSON.parse(savedDecks);
+    if (savedProgress) state.userProgress = JSON.parse(savedProgress);
+
+    // --- Cloud Sync Logic ---
+    function initCloudSync() {
+      if (!db || !state.syncKey) {
+        document.getElementById('sync-dot').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('sync-dot').classList.remove('hidden');
+
+      if (syncUnsubscribe) syncUnsubscribe();
+
+      const userDocRef = db.collection('sync_users').doc(state.syncKey);
+
+      // Real-time listener: triggers whenever iPhone OR iPad modifies cloud data
+      syncUnsubscribe = userDocRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const cloudData = doc.data();
+          if (cloudData.decks) state.decks = cloudData.decks;
+          if (cloudData.userProgress) state.userProgress = cloudData.userProgress;
+          if (cloudData.currentDeckId && state.decks[cloudData.currentDeckId]) {
+            state.currentDeckId = cloudData.currentDeckId;
+          }
+          localStorage.setItem('anesthesia_decks', JSON.stringify(state.decks));
+          localStorage.setItem('anesthesia_progress', JSON.stringify(state.userProgress));
+          render();
+        } else {
+          pushStateToCloud();
+        }
+      });
+    }
+
+    function pushStateToCloud() {
+      if (!db || !state.syncKey) return;
+      db.collection('sync_users').doc(state.syncKey).set({
+        decks: state.decks,
+        userProgress: state.userProgress,
+        currentDeckId: state.currentDeckId,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    // --- Markdown Parser ---
+    function parseMarkdownQuestions(mdText, fileName) {
+      const questions = [];
+      const blocks = mdText.split(/###\s+❓\s+Question\s+\d+|###\s+Question\s+\d+/i);
+      
+      const titleMatch = mdText.match(/^#\s+(.*)/m);
+      const deckTitle = titleMatch ? titleMatch[1].replace(/📝|Active Recall.*/g, '').trim() : fileName.replace('.md', '');
+
+      blocks.forEach((block, idx) => {
+        if (!block.trim() || idx === 0) return;
+
+        const stemMatch = block.match(/^\s*\d*\.?\s*([\s\S]*?)(?=\n\*\*Options:\*\*|\n\*[ ]+[A-E]-)/i);
+        const stem = stemMatch ? stemMatch[1].trim() : 'Question content';
+
+        const options = [];
+        const optionRegex = /\*\s+([A-E])-\s*([^\n]+)/g;
+        let optMatch;
+        while ((optMatch = optionRegex.exec(block)) !== null) {
+          options.push({ letter: optMatch[1], text: optMatch[2].trim() });
+        }
+
+        let correctAnswer = null;
+        const answerMatch = block.match(/👉\s*\*\*([A-E])-|\*\*Correct Answer:\*\*\s*👉?\s*\*?\*?([A-E])/i);
+        if (answerMatch) correctAnswer = answerMatch[1] || answerMatch[2];
+
+        let explanation = '';
+        const expMatch = block.match(/\*\*Rationale:\*\*([\s\S]*?)(?=<\/details>|---|$)/i) ||
+                          block.match(/```text([\s\S]*?)```/i);
+        if (expMatch) explanation = expMatch[1].trim();
+
+        if (options.length > 0) {
+          questions.push({ id: idx, stem, options, correctAnswer, explanation });
+        }
+      });
+
+      return { title: deckTitle, questions };
+    }
+
+    function saveState() {
+      localStorage.setItem('anesthesia_decks', JSON.stringify(state.decks));
+      localStorage.setItem('anesthesia_progress', JSON.stringify(state.userProgress));
+      render();
+      pushStateToCloud();
+    }
+
+    // --- UI Rendering ---
+    function render() {
+      lucide.createIcons();
+      const currentDeck = state.decks[state.currentDeckId];
+
+      if (!currentDeck || currentDeck.questions.length === 0) {
+        document.getElementById('view-empty').classList.remove('hidden');
+        document.getElementById('view-quiz').classList.add('hidden');
+        document.getElementById('quiz-footer').classList.add('hidden');
+        document.getElementById('deck-title').textContent = 'No Deck Loaded';
+        document.getElementById('deck-progress-text').textContent = '0 / 0 Answered';
+        return;
+      }
+
+      document.getElementById('view-empty').classList.add('hidden');
+      document.getElementById('view-quiz').classList.remove('hidden');
+      document.getElementById('quiz-footer').classList.remove('hidden');
+
+      const progress = state.userProgress[state.currentDeckId] || { currentIndex: 0, answers: {}, flags: [] };
+      const qIndex = progress.currentIndex || 0;
+      const q = currentDeck.questions[qIndex];
+
+      document.getElementById('deck-title').textContent = currentDeck.title;
+      const answeredCount = Object.keys(progress.answers || {}).length;
+      document.getElementById('deck-progress-text').textContent = `${answeredCount} / ${currentDeck.questions.length} Answered`;
+      
+      const pct = (answeredCount / currentDeck.questions.length) * 100;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+
+      document.getElementById('question-number-badge').textContent = `Question ${qIndex + 1} of ${currentDeck.questions.length}`;
+      document.getElementById('question-stem').textContent = q.stem;
+
+      const isFlagged = (progress.flags || []).includes(qIndex);
+      const flagBtn = document.getElementById('btn-flag');
+      flagBtn.className = isFlagged ? 'p-2 text-amber-400 rounded-lg active:bg-slate-800' : 'p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800';
+
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      const selectedAnswer = (progress.answers || {})[qIndex];
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-4 rounded-xl border font-medium text-sm transition flex items-start space-x-3 `;
+
+        if (selectedAnswer) {
+          if (opt.letter === q.correctAnswer) {
+            btn.className += 'bg-emerald-950/40 border-emerald-500/80 text-emerald-200';
+          } else if (opt.letter === selectedAnswer) {
+            btn.className += 'bg-rose-950/40 border-rose-500/80 text-rose-200';
+          } else {
+            btn.className += 'bg-slate-900/50 border-slate-800/50 text-slate-500';
+          }
+        } else {
+          btn.className += 'bg-slate-900 border-slate-800 hover:border-slate-700 active:bg-slate-800 text-slate-200';
+        }
+
+        btn.innerHTML = `<span class="font-bold px-2 py-0.5 rounded bg-slate-800 text-xs text-slate-300">${opt.letter}</span><span>${opt.text}</span>`;
+        btn.onclick = () => handleSelectOption(qIndex, opt.letter);
+        optionsContainer.appendChild(btn);
+      });
+
+      const expBox = document.getElementById('explanation-box');
+      if (selectedAnswer && (q.explanation || q.correctAnswer)) {
+        expBox.classList.remove('hidden');
+        document.getElementById('explanation-content').innerHTML = `
+          <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
+          <div class="mt-1 text-slate-300">${q.explanation || 'No additional reference provided.'}</div>
+        `;
+      } else {
+        expBox.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function handleSelectOption(qIndex, letter) {
+      const currentDeck = state.decks[state.currentDeckId];
+      if (!currentDeck) return;
+      if (!state.userProgress[state.currentDeckId]) {
+        state.userProgress[state.currentDeckId] = { currentIndex: qIndex, answers: {}, flags: [] };
+      }
+      state.userProgress[state.currentDeckId].answers[qIndex] = letter;
+      saveState();
+    }
+
+    function processUploadedFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const parsed = parseMarkdownQuestions(text, file.name);
+        const deckId = 'deck_' + Date.now();
+        state.decks[deckId] = parsed;
+        state.currentDeckId = deckId;
+        if (!state.userProgress[deckId]) {
+          state.userProgress[deckId] = { currentIndex: 0, answers: {}, flags: [] };
+        }
+        saveState();
+        document.getElementById('modal-decks').classList.add('hidden');
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById('file-input').addEventListener('change', (e) => {
+      if (e.target.files[0]) processUploadedFile(e.target.files[0]);
+    });
+    document.getElementById('modal-file-input').addEventListener('change', (e) => {
+      if (e.target.files[0]) processUploadedFile(e.target.files[0]);
+    });
+
+    document.getElementById('btn-next').onclick = () => {
+      const p = state.userProgress[state.currentDeckId];
+      const d = state.decks[state.currentDeckId];
+      if (p && d && p.currentIndex < d.questions.length - 1) {
+        p.currentIndex++;
+        saveState();
+      }
+    };
+    document.getElementById('btn-prev').onclick = () => {
+      const p = state.userProgress[state.currentDeckId];
+      if (p && p.currentIndex > 0) {
+        p.currentIndex--;
+        saveState();
+      }
+    };
+    document.getElementById('btn-reveal').onclick = () => {
+      const p = state.userProgress[state.currentDeckId];
+      const d = state.decks[state.currentDeckId];
+      if (p && d) {
+        const q = d.questions[p.currentIndex];
+        handleSelectOption(p.currentIndex, q.correctAnswer || 'A');
+      }
+    };
+    document.getElementById('btn-flag').onclick = () => {
+      const p = state.userProgress[state.currentDeckId];
+      if (!p) return;
+      p.flags = p.flags || [];
+      const idx = p.flags.indexOf(p.currentIndex);
+      if (idx > -1) p.flags.splice(idx, 1);
+      else p.flags.push(p.currentIndex);
+      saveState();
+    };
+
+    // --- Modal Controls ---
+    document.getElementById('btn-menu').onclick = () => {
+      const list = document.getElementById('deck-list');
+      list.innerHTML = '';
+      Object.keys(state.decks).forEach(id => {
+        const deck = state.decks[id];
+        const progress = state.userProgress[id] || { answers: {} };
+        const answered = Object.keys(progress.answers || {}).length;
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer ${id === state.currentDeckId ? 'bg-blue-600/10 border-blue-500/50 text-blue-200' : 'bg-slate-800/40 border-slate-700/50 text-slate-300'}`;
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-sm truncate max-w-[200px]">${deck.title}</div>
+            <div class="text-xs text-slate-400">${answered}/${deck.questions.length} completed</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+        `;
+        item.onclick = () => {
+          state.currentDeckId = id;
+          saveState();
+          document.getElementById('modal-decks').classList.add('hidden');
+        };
+        list.appendChild(item);
+      });
+      document.getElementById('modal-decks').classList.remove('hidden');
+      lucide.createIcons();
+    };
+    document.getElementById('btn-close-decks').onclick = () => {
+      document.getElementById('modal-decks').classList.add('hidden');
+    };
+
+    document.getElementById('btn-sync-modal').onclick = () => {
+      document.getElementById('input-sync-key').value = state.syncKey;
+      document.getElementById('modal-sync').classList.remove('hidden');
+    };
+    document.getElementById('btn-close-sync').onclick = () => {
+      document.getElementById('modal-sync').classList.add('hidden');
+    };
+    document.getElementById('btn-save-sync').onclick = () => {
+      const key = document.getElementById('input-sync-key').value.trim().toUpperCase();
+      if (key) {
+        state.syncKey = key;
+        localStorage.setItem('anesthesia_sync_key', key);
+        initCloudSync();
+        document.getElementById('modal-sync').classList.add('hidden');
+      }
+    };
+
+    // Initialize
+    if (!state.currentDeckId && Object.keys(state.decks).length > 0) {
+      state.currentDeckId = Object.keys(state.decks)[0];
+    }
+    initCloudSync();
+    render();
+  </script>
+</body>
+</html>
