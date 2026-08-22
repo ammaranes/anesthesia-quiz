@@ -7,11 +7,21 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Saudi Board Anesthesia Practice Suite</title>
   
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <!-- Firebase SDKs (v9 Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <!-- ========================================== -->
+  <!-- 📚 OFFICIAL DECK REGISTRY SCRIPTS          -->
+  <!-- Add new deck files here in the future      -->
+  <!-- ========================================== -->
+  <script src="decks/general_clinical.js"></script>
+  <script src="decks/regional_anesthesia.js"></script>
 
   <style>
     body { -webkit-tap-highlight-color: transparent; }
@@ -21,54 +31,61 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none">
 
+  <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 safe-top">
     <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800" title="Decks & Topics">
+        <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800" title="Question Banks">
           <i data-lucide="layers" class="w-5 h-5"></i>
         </button>
         <div>
-          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[150px] sm:max-w-xs">No Deck Loaded</h1>
+          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[140px] sm:max-w-xs">Question Bank</h1>
           <p id="deck-progress-text" class="text-xs text-emerald-400">0 / 0 Answered</p>
         </div>
       </div>
       
+      <!-- Top Action Controls -->
       <div class="flex items-center space-x-1 sm:space-x-2">
-        <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition" title="Toggle Random / Shuffled Order">
+        <!-- Shuffle Toggle Button -->
+        <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition" title="Toggle Random Order">
           <i data-lucide="shuffle" class="w-5 h-5"></i>
         </button>
         
+        <!-- Flag / Bookmark Button -->
         <button id="btn-flag" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition" title="Bookmark Question">
           <i data-lucide="bookmark" class="w-5 h-5"></i>
         </button>
         
-        <button id="btn-sync-modal" class="p-2 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center transition" title="Cloud Sync Settings">
-          <i data-lucide="cloud" class="w-5 h-5"></i>
-          <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 ml-1 hidden"></span>
+        <!-- User Account / Sync Button -->
+        <button id="btn-auth-modal" class="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center transition" title="Account & Sync">
+          <div id="auth-avatar" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </div>
+          <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 -ml-1.5 -mt-3 hidden"></span>
         </button>
       </div>
     </div>
     
+    <!-- Linear Progress Bar -->
     <div class="w-full bg-slate-800 h-1">
       <div id="progress-bar-fill" class="bg-emerald-500 h-1 w-0 transition-all duration-300"></div>
     </div>
   </header>
 
+  <!-- Main Question Container -->
   <main class="flex-1 max-w-3xl w-full mx-auto p-4 flex flex-col justify-between">
     
-    <div id="view-empty" class="my-auto text-center py-12 px-4">
-      <div class="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-        <i data-lucide="file-up" class="w-8 h-8"></i>
+    <!-- Empty State -->
+    <div id="view-empty" class="hidden my-auto text-center py-12 px-4">
+      <div class="w-16 h-16 bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700">
+        <i data-lucide="folder-open" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-xl font-bold text-slate-100 mb-2">Import Your Study Deck</h2>
-      <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">Upload your Markdown (.md) MCQ files. Everything will automatically sync between your iPhone and iPad.</p>
-      <label class="inline-flex items-center px-5 py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl font-semibold cursor-pointer shadow-lg shadow-blue-600/30 transition">
-        <i data-lucide="upload" class="w-5 h-5 mr-2"></i> Choose .md File
-        <input type="file" id="file-input" accept=".md" class="hidden" />
-      </label>
+      <h2 class="text-xl font-bold text-slate-100 mb-2">No Quizzes Available</h2>
+      <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">No question banks found. Please ensure your deck scripts are loaded in the repository.</p>
     </div>
 
-    <div id="view-quiz" class="hidden flex-1 flex flex-col">
+    <!-- Active Question View -->
+    <div id="view-quiz" class="flex-1 flex flex-col">
       <div class="flex items-center justify-between text-xs font-semibold text-slate-400 mb-3">
         <div class="flex items-center space-x-2">
           <span id="question-number-badge" class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-md text-slate-300">Question 1</span>
@@ -77,12 +94,15 @@
         <span id="score-badge" class="text-slate-400">Accuracy: 100%</span>
       </div>
 
+      <!-- Question Stem -->
       <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm mb-4">
         <p id="question-stem" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed"></p>
       </div>
 
+      <!-- Options Container -->
       <div id="options-container" class="space-y-3 mb-6"></div>
 
+      <!-- Explanation & Reference Box -->
       <div id="explanation-box" class="hidden bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 mb-6 text-sm text-slate-300">
         <div class="flex items-center text-emerald-400 font-bold mb-2">
           <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Reference & Rationale
@@ -91,7 +111,8 @@
       </div>
     </div>
 
-    <footer id="quiz-footer" class="hidden sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-4 safe-bottom border-t border-slate-800/80">
+    <!-- Navigation Bottom Bar -->
+    <footer id="quiz-footer" class="sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-4 safe-bottom border-t border-slate-800/80">
       <div class="flex items-center justify-between space-x-3">
         <button id="btn-prev" class="flex-1 py-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 border border-slate-800 rounded-xl font-semibold text-sm flex items-center justify-center text-slate-300 transition">
           <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
@@ -106,45 +127,80 @@
     </footer>
   </main>
 
+  <!-- Deck / Module Switcher Modal -->
   <div id="modal-decks" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-        <h3 class="font-bold text-slate-100">Your Study Decks</h3>
+        <h3 class="font-bold text-slate-100">Manage Question Banks</h3>
         <button id="btn-close-decks" class="p-1 text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div id="deck-list" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
-      <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-        <label class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold text-sm flex items-center justify-center cursor-pointer">
-          <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Import New .md File
-          <input type="file" id="modal-file-input" accept=".md" class="hidden" />
-        </label>
+      <div id="deck-list" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- Rename Deck Modal -->
+  <div id="modal-rename" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-5 shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-slate-100 text-sm">Rename Quiz</h4>
+        <button id="btn-close-rename" class="p-1 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">Enter a new display title for this quiz bank:</p>
+      <input type="text" id="input-rename-title" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm mb-4 focus:border-blue-500 focus:outline-none" />
+      <div class="flex items-center space-x-2">
+        <button id="btn-cancel-rename" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition">Cancel</button>
+        <button id="btn-confirm-rename" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition">Save Title</button>
       </div>
     </div>
   </div>
 
-  <div id="modal-sync" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <!-- User Account & Sync Modal -->
+  <div id="modal-auth" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 flex flex-col">
       <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center space-x-2 text-blue-400 font-bold">
-          <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-          <span>Cloud Sync Setup</span>
+        <div class="flex items-center space-x-2 text-blue-400 font-bold text-base">
+          <i data-lucide="cloud" class="w-5 h-5"></i>
+          <span>Cloud Sync & Account</span>
         </div>
-        <button id="btn-close-sync" class="p-1 text-slate-400 hover:text-white">
+        <button id="btn-close-auth" class="p-1 text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-        Enter the same <b>Sync Passphrase</b> on all your devices (iPhone, iPad, Mac). Your progress, bookmarks, and quiz decks will remain synchronized automatically.
-      </p>
-      <input type="text" id="input-sync-key" placeholder="e.g. AMMAR-STUDY-2026" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 font-mono text-sm uppercase mb-4 focus:border-blue-500 focus:outline-none" />
-      <button id="btn-save-sync" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold text-sm text-white">
-        Connect & Synchronize
-      </button>
+
+      <!-- State: Logged In -->
+      <div id="auth-state-logged-in" class="hidden flex-col items-center text-center py-4">
+        <div id="user-display-avatar" class="w-14 h-14 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg font-bold mb-3"></div>
+        <h4 id="user-display-name" class="font-bold text-slate-100 text-base">User Name</h4>
+        <p id="user-display-email" class="text-xs text-slate-400 mb-6">user@example.com</p>
+        <div class="w-full bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-3 text-xs text-emerald-300 mb-6 flex items-center justify-center">
+          <i data-lucide="check" class="w-4 h-4 mr-1.5"></i> Real-time sync active across your devices
+        </div>
+        <button id="btn-logout" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-rose-400 font-semibold rounded-xl text-sm transition">
+          Sign Out
+        </button>
+      </div>
+
+      <!-- State: Guest / Logged Out -->
+      <div id="auth-state-logged-out" class="flex flex-col">
+        <p class="text-xs text-slate-400 mb-5 leading-relaxed">
+          Sign in to synchronize your progress, accuracy, and bookmarks across your iPhone, iPad, and computer.
+        </p>
+        <button id="btn-google-login" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold rounded-xl text-sm flex items-center justify-center space-x-2 shadow-md transition mb-3">
+          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+        <div class="text-[11px] text-center text-slate-500 mt-2">
+          Guest mode is active. Progress is saved locally in this browser.
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Application Logic -->
   <script>
     // ==========================================
     // 🔑 FIREBASE CONFIGURATION
@@ -158,53 +214,112 @@
       appId: "1:94979024020:web:687bd4c064b87ff1180081"
     };
 
+    let auth = null;
     let db = null;
     let syncUnsubscribe = null;
+    let currentUser = null;
+    let editingDeckId = null;
 
     try {
       firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
       db = firebase.firestore();
     } catch (e) {
-      console.warn("Firebase initialization skipped or error:", e);
+      console.warn("Firebase initialization warning:", e);
     }
 
-    // --- State Structure ---
+    // --- State Initialization with Registry ---
+    const BASE_OFFICIAL_DECKS = window.OFFICIAL_DECKS || {};
+
     let state = {
-      decks: {},           
-      currentDeckId: null,
-      userProgress: {},    // { deckId: { currentIndex: 0, answers: {}, flags: [], isShuffled: false, order: [] } }
-      syncKey: localStorage.getItem('anesthesia_sync_key') || ''
+      decks: JSON.parse(JSON.stringify(BASE_OFFICIAL_DECKS)),
+      currentDeckId: Object.keys(BASE_OFFICIAL_DECKS)[0] || null,
+      userProgress: {}
     };
 
     // Load Local Storage Cache
-    const savedDecks = localStorage.getItem('anesthesia_decks');
-    const savedProgress = localStorage.getItem('anesthesia_progress');
-    if (savedDecks) state.decks = JSON.parse(savedDecks);
-    if (savedProgress) state.userProgress = JSON.parse(savedProgress);
+    const savedDecks = localStorage.getItem('anesthesia_user_decks');
+    if (savedDecks) {
+      try {
+        const parsed = JSON.parse(savedDecks);
+        // Merge with official registry
+        Object.keys(BASE_OFFICIAL_DECKS).forEach(k => {
+          if (!parsed[k]) parsed[k] = BASE_OFFICIAL_DECKS[k];
+        });
+        state.decks = parsed;
+      } catch (e) {}
+    }
 
-    // --- Cloud Sync Logic ---
-    function initCloudSync() {
-      if (!db || !state.syncKey) {
-        document.getElementById('sync-dot').classList.add('hidden');
-        return;
+    const savedProgress = localStorage.getItem('anesthesia_user_progress');
+    if (savedProgress) {
+      try { state.userProgress = JSON.parse(savedProgress); } catch (e) {}
+    }
+
+    if (!state.currentDeckId || !state.decks[state.currentDeckId]) {
+      state.currentDeckId = Object.keys(state.decks)[0] || null;
+    }
+
+    // --- Authentication & User-Specific Sync ---
+    if (auth) {
+      auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        updateAuthUI(user);
+
+        if (user) {
+          initUserCloudSync(user.uid);
+        } else {
+          if (syncUnsubscribe) syncUnsubscribe();
+          document.getElementById('sync-dot').classList.add('hidden');
+        }
+      });
+    }
+
+    function updateAuthUI(user) {
+      const loggedInView = document.getElementById('auth-state-logged-in');
+      const loggedOutView = document.getElementById('auth-state-logged-out');
+      const avatar = document.getElementById('auth-avatar');
+
+      if (user) {
+        loggedInView.classList.remove('hidden');
+        loggedOutView.classList.add('hidden');
+        document.getElementById('user-display-name').textContent = user.displayName || 'Doctor / Candidate';
+        document.getElementById('user-display-email').textContent = user.email;
+        
+        const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+        document.getElementById('user-display-avatar').textContent = initial;
+        avatar.innerHTML = `<span class="text-blue-400 font-bold">${initial}</span>`;
+      } else {
+        loggedInView.classList.add('hidden');
+        loggedOutView.classList.remove('hidden');
+        avatar.innerHTML = `<i data-lucide="user" class="w-4 h-4"></i>`;
       }
+      lucide.createIcons();
+    }
 
+    function initUserCloudSync(userId) {
+      if (!db) return;
       document.getElementById('sync-dot').classList.remove('hidden');
 
       if (syncUnsubscribe) syncUnsubscribe();
 
-      const userDocRef = db.collection('sync_users').doc(state.syncKey);
+      const userDocRef = db.collection('users').doc(userId);
 
       syncUnsubscribe = userDocRef.onSnapshot((doc) => {
         if (doc.exists) {
           const cloudData = doc.data();
-          if (cloudData.decks) state.decks = cloudData.decks;
-          if (cloudData.userProgress) state.userProgress = cloudData.userProgress;
+          if (cloudData.decks && Object.keys(cloudData.decks).length > 0) {
+            state.decks = Object.assign(JSON.parse(JSON.stringify(BASE_OFFICIAL_DECKS)), cloudData.decks);
+          }
+          if (cloudData.userProgress) {
+            state.userProgress = cloudData.userProgress;
+          }
           if (cloudData.currentDeckId && state.decks[cloudData.currentDeckId]) {
             state.currentDeckId = cloudData.currentDeckId;
+          } else {
+            state.currentDeckId = Object.keys(state.decks)[0] || null;
           }
-          localStorage.setItem('anesthesia_decks', JSON.stringify(state.decks));
-          localStorage.setItem('anesthesia_progress', JSON.stringify(state.userProgress));
+          localStorage.setItem('anesthesia_user_decks', JSON.stringify(state.decks));
+          localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
           render();
         } else {
           pushStateToCloud();
@@ -213,54 +328,68 @@
     }
 
     function pushStateToCloud() {
-      if (!db || !state.syncKey) return;
-      db.collection('sync_users').doc(state.syncKey).set({
+      if (!db || !currentUser) return;
+      db.collection('users').doc(currentUser.uid).set({
         decks: state.decks,
         userProgress: state.userProgress,
         currentDeckId: state.currentDeckId,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    }
-
-    // --- Markdown Parser ---
-    function parseMarkdownQuestions(mdText, fileName) {
-      const questions = [];
-      const blocks = mdText.split(/###\s+❓\s+Question\s+\d+|###\s+Question\s+\d+/i);
-      
-      const titleMatch = mdText.match(/^#\s+(.*)/m);
-      const deckTitle = titleMatch ? titleMatch[1].replace(/📝|Active Recall.*/g, '').trim() : fileName.replace('.md', '');
-
-      blocks.forEach((block, idx) => {
-        if (!block.trim() || idx === 0) return;
-
-        const stemMatch = block.match(/^\s*\d*\.?\s*([\s\S]*?)(?=\n\*\*Options:\*\*|\n\*[ ]+[A-E]-)/i);
-        const stem = stemMatch ? stemMatch[1].trim() : 'Question content';
-
-        const options = [];
-        const optionRegex = /\*\s+([A-E])-\s*([^\n]+)/g;
-        let optMatch;
-        while ((optMatch = optionRegex.exec(block)) !== null) {
-          options.push({ letter: optMatch[1], text: optMatch[2].trim() });
-        }
-
-        let correctAnswer = null;
-        const answerMatch = block.match(/👉\s*\*\*([A-E])-|\*\*Correct Answer:\*\*\s*👉?\s*\*?\*?([A-E])/i);
-        if (answerMatch) correctAnswer = answerMatch[1] || answerMatch[2];
-
-        let explanation = '';
-        const expMatch = block.match(/\*\*Rationale:\*\*([\s\S]*?)(?=<\/details>|---|$)/i) ||
-                          block.match(/```text([\s\S]*?)```/i);
-        if (expMatch) explanation = expMatch[1].trim();
-
-        if (options.length > 0) {
-          questions.push({ id: idx, stem, options, correctAnswer, explanation });
-        }
       });
-
-      return { title: deckTitle, questions };
     }
 
-    // --- Shuffle / Randomizer Utilities (Fisher-Yates) ---
+    // --- Deck Editing & Deletion Handlers ---
+    window.openRenameModal = function(deckId, e) {
+      if (e) e.stopPropagation();
+      editingDeckId = deckId;
+      const deck = state.decks[deckId];
+      if (!deck) return;
+      
+      document.getElementById('input-rename-title').value = deck.title;
+      document.getElementById('modal-rename').classList.remove('hidden');
+      document.getElementById('input-rename-title').focus();
+    };
+
+    window.handleDeleteDeck = function(deckId, e) {
+      if (e) e.stopPropagation();
+      const deck = state.decks[deckId];
+      if (!deck) return;
+
+      const confirmDelete = confirm(`Are you sure you want to delete "${deck.title}"? All progress for this quiz will be permanently removed.`);
+      if (!confirmDelete) return;
+
+      delete state.decks[deckId];
+      if (state.userProgress[deckId]) delete state.userProgress[deckId];
+
+      if (state.currentDeckId === deckId) {
+        state.currentDeckId = Object.keys(state.decks)[0] || null;
+      }
+
+      saveState();
+      renderDeckList();
+    };
+
+    document.getElementById('btn-confirm-rename').onclick = () => {
+      const newTitle = document.getElementById('input-rename-title').value.trim();
+      if (newTitle && editingDeckId && state.decks[editingDeckId]) {
+        state.decks[editingDeckId].title = newTitle;
+        saveState();
+        renderDeckList();
+      }
+      document.getElementById('modal-rename').classList.add('hidden');
+      editingDeckId = null;
+    };
+
+    document.getElementById('btn-cancel-rename').onclick = () => {
+      document.getElementById('modal-rename').classList.add('hidden');
+      editingDeckId = null;
+    };
+
+    document.getElementById('btn-close-rename').onclick = () => {
+      document.getElementById('modal-rename').classList.add('hidden');
+      editingDeckId = null;
+    };
+
+    // --- Shuffle Engine (Fisher-Yates) ---
     function generateShuffledIndices(length) {
       const arr = Array.from({ length }, (_, i) => i);
       for (let i = arr.length - 1; i > 0; i--) {
@@ -290,6 +419,7 @@
     }
 
     function getProgress() {
+      if (!state.currentDeckId) return { currentIndex: 0, answers: {}, flags: [], isShuffled: false, order: [] };
       if (!state.userProgress[state.currentDeckId]) {
         state.userProgress[state.currentDeckId] = {
           currentIndex: 0,
@@ -303,8 +433,8 @@
     }
 
     function saveState() {
-      localStorage.setItem('anesthesia_decks', JSON.stringify(state.decks));
-      localStorage.setItem('anesthesia_progress', JSON.stringify(state.userProgress));
+      localStorage.setItem('anesthesia_user_decks', JSON.stringify(state.decks));
+      localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
       render();
       pushStateToCloud();
     }
@@ -312,14 +442,15 @@
     // --- UI Rendering ---
     function render() {
       lucide.createIcons();
-      const currentDeck = state.decks[state.currentDeckId];
+      const currentDeck = state.currentDeckId ? state.decks[state.currentDeckId] : null;
 
-      if (!currentDeck || currentDeck.questions.length === 0) {
+      if (!currentDeck || !currentDeck.questions || currentDeck.questions.length === 0) {
         document.getElementById('view-empty').classList.remove('hidden');
         document.getElementById('view-quiz').classList.add('hidden');
         document.getElementById('quiz-footer').classList.add('hidden');
-        document.getElementById('deck-title').textContent = 'No Deck Loaded';
+        document.getElementById('deck-title').textContent = 'No Deck Selected';
         document.getElementById('deck-progress-text').textContent = '0 / 0 Answered';
+        document.getElementById('progress-bar-fill').style.width = '0%';
         return;
       }
 
@@ -335,14 +466,14 @@
         ? progress.order[qPointer]
         : qPointer;
 
-      const q = currentDeck.questions[actualIndex];
+      const q = currentDeck.questions[actualIndex] || currentDeck.questions[0];
 
       // Update Header
       document.getElementById('deck-title').textContent = currentDeck.title;
       const answeredCount = Object.keys(progress.answers || {}).length;
       document.getElementById('deck-progress-text').textContent = `${answeredCount} / ${totalQ} Answered`;
       
-      const pct = (answeredCount / totalQ) * 100;
+      const pct = totalQ > 0 ? (answeredCount / totalQ) * 100 : 0;
       document.getElementById('progress-bar-fill').style.width = `${pct}%`;
 
       // Update Accuracy
@@ -354,7 +485,7 @@
       const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
       document.getElementById('score-badge').textContent = `Accuracy: ${acc}%`;
 
-      // Update Shuffle Button Active State
+      // Update Shuffle Button State
       const shuffleBtn = document.getElementById('btn-shuffle');
       const shuffleTag = document.getElementById('shuffle-mode-tag');
       if (progress.isShuffled) {
@@ -424,33 +555,50 @@
       saveState();
     }
 
-    function processUploadedFile(file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const parsed = parseMarkdownQuestions(text, file.name);
-        const deckId = 'deck_' + Date.now();
-        state.decks[deckId] = parsed;
-        state.currentDeckId = deckId;
-        state.userProgress[deckId] = { 
-          currentIndex: 0, 
-          answers: {}, 
-          flags: [], 
-          isShuffled: false, 
-          order: [] 
-        };
-        saveState();
-        document.getElementById('modal-decks').classList.add('hidden');
-      };
-      reader.readAsText(file);
-    }
+    function renderDeckList() {
+      const list = document.getElementById('deck-list');
+      list.innerHTML = '';
 
-    document.getElementById('file-input').addEventListener('change', (e) => {
-      if (e.target.files[0]) processUploadedFile(e.target.files[0]);
-    });
-    document.getElementById('modal-file-input').addEventListener('change', (e) => {
-      if (e.target.files[0]) processUploadedFile(e.target.files[0]);
-    });
+      const deckKeys = Object.keys(state.decks);
+      if (deckKeys.length === 0) {
+        list.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">No question banks found.</div>`;
+        return;
+      }
+
+      deckKeys.forEach(id => {
+        const deck = state.decks[id];
+        const progress = state.userProgress[id] || { answers: {} };
+        const answered = Object.keys(progress.answers || {}).length;
+        const isCurrent = id === state.currentDeckId;
+
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border flex items-center justify-between transition ${isCurrent ? 'bg-blue-600/10 border-blue-500/50 text-blue-200' : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 text-slate-300'}`;
+        
+        item.innerHTML = `
+          <div class="flex-1 min-w-0 cursor-pointer pr-2">
+            <div class="font-bold text-sm truncate">${deck.title}</div>
+            <div class="text-xs text-slate-400 mt-0.5">${answered}/${deck.questions.length} completed</div>
+          </div>
+          <div class="flex items-center space-x-1 shrink-0">
+            <button class="p-2 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-700/60 transition" title="Rename" onclick="openRenameModal('${id}', event)">
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button class="p-2 text-slate-400 hover:text-rose-400 rounded-lg active:bg-slate-700/60 transition" title="Delete" onclick="handleDeleteDeck('${id}', event)">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+
+        item.querySelector('.flex-1').onclick = () => {
+          state.currentDeckId = id;
+          saveState();
+          document.getElementById('modal-decks').classList.add('hidden');
+        };
+
+        list.appendChild(item);
+      });
+      lucide.createIcons();
+    }
 
     // --- Navigation & Control Events ---
     document.getElementById('btn-shuffle').onclick = () => {
@@ -497,62 +645,42 @@
       saveState();
     };
 
-    // --- Modal Controls ---
+    // --- Modals & Auth Events ---
     document.getElementById('btn-menu').onclick = () => {
-      const list = document.getElementById('deck-list');
-      list.innerHTML = '';
-      Object.keys(state.decks).forEach(id => {
-        const deck = state.decks[id];
-        const progress = state.userProgress[id] || { answers: {} };
-        const answered = Object.keys(progress.answers || {}).length;
-        const item = document.createElement('div');
-        item.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer ${id === state.currentDeckId ? 'bg-blue-600/10 border-blue-500/50 text-blue-200' : 'bg-slate-800/40 border-slate-700/50 text-slate-300'}`;
-        item.innerHTML = `
-          <div>
-            <div class="font-bold text-sm truncate max-w-[200px]">${deck.title}</div>
-            <div class="text-xs text-slate-400">${answered}/${deck.questions.length} completed</div>
-          </div>
-          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-        `;
-        item.onclick = () => {
-          state.currentDeckId = id;
-          saveState();
-          document.getElementById('modal-decks').classList.add('hidden');
-        };
-        list.appendChild(item);
-      });
+      renderDeckList();
       document.getElementById('modal-decks').classList.remove('hidden');
-      lucide.createIcons();
     };
 
     document.getElementById('btn-close-decks').onclick = () => {
       document.getElementById('modal-decks').classList.add('hidden');
     };
 
-    document.getElementById('btn-sync-modal').onclick = () => {
-      document.getElementById('input-sync-key').value = state.syncKey;
-      document.getElementById('modal-sync').classList.remove('hidden');
+    document.getElementById('btn-auth-modal').onclick = () => {
+      document.getElementById('modal-auth').classList.remove('hidden');
     };
 
-    document.getElementById('btn-close-sync').onclick = () => {
-      document.getElementById('modal-sync').classList.add('hidden');
+    document.getElementById('btn-close-auth').onclick = () => {
+      document.getElementById('modal-auth').classList.add('hidden');
     };
 
-    document.getElementById('btn-save-sync').onclick = () => {
-      const key = document.getElementById('input-sync-key').value.trim().toUpperCase();
-      if (key) {
-        state.syncKey = key;
-        localStorage.setItem('anesthesia_sync_key', key);
-        initCloudSync();
-        document.getElementById('modal-sync').classList.add('hidden');
-      }
+    document.getElementById('btn-google-login').onclick = () => {
+      if (!auth) return;
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(() => {
+        document.getElementById('modal-auth').classList.add('hidden');
+      }).catch((err) => {
+        alert("Authentication error: " + err.message);
+      });
     };
 
-    // Initialize
-    if (!state.currentDeckId && Object.keys(state.decks).length > 0) {
-      state.currentDeckId = Object.keys(state.decks)[0];
-    }
-    initCloudSync();
+    document.getElementById('btn-logout').onclick = () => {
+      if (!auth) return;
+      auth.signOut().then(() => {
+        document.getElementById('modal-auth').classList.add('hidden');
+      });
+    };
+
+    // Initialize UI
     render();
   </script>
 </body>
