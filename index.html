@@ -42,12 +42,9 @@
 
   <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 safe-top">
-    <div class="min-w-0 flex-1">
-  <div class="text-[10px] uppercase font-bold text-blue-400 tracking-wider">Saudi Anesthesia Board QB Practice</div>
-  <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate">Core Anesthesia</h1>
-</div>
+    <div class="max-w-4xl mx-auto px-4 py-2 min-h-[3.75rem] flex items-center justify-between gap-3">
       
-      <!-- Left Section: Menu, Logo, and Title -->
+      <!-- Left Section: Menu, Logo, and Dual-Line Brand/Deck Title -->
       <div class="flex items-center space-x-2.5 min-w-0 flex-1">
         <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 shrink-0" title="Question Banks">
           <i data-lucide="layers" class="w-5 h-5"></i>
@@ -55,26 +52,38 @@
         
         <img src="logo.svg" alt="App Logo" class="w-8 h-8 rounded-lg border border-slate-700/60 shrink-0 object-contain" />
 
-        <div class="min-w-0 flex-1">
-          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate">Saudi Anesthesia Board QB Practice</h1>
-          <p id="deck-progress-text" class="text-xs text-emerald-400 truncate">0 / 0 Answered</p>
+        <div class="min-w-0 flex-1 flex flex-col justify-center">
+          <!-- Permanent App Name (Satisfies Google OAuth Crawler) -->
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400 truncate leading-tight">
+            Saudi Anesthesia Board QB Practice
+          </span>
+          <!-- Dynamic Current Deck Title -->
+          <div class="flex items-center space-x-2 truncate">
+            <h1 id="deck-title" class="font-bold text-xs sm:text-sm text-slate-100 truncate leading-snug">
+              Question Bank
+            </h1>
+            <span class="text-slate-600 text-xs">•</span>
+            <p id="deck-progress-text" class="text-[11px] font-medium text-emerald-400 truncate leading-snug">
+              0 / 0 Answered
+            </p>
+          </div>
         </div>
       </div>
       
-      <!-- Right Section: Action Controls (Locked Horizontal) -->
+      <!-- Right Section: Action Controls (Locked Row) -->
       <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
         <!-- Shuffle Toggle Button -->
-        <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition" title="Toggle Random Order">
+        <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Toggle Random Order">
           <i data-lucide="shuffle" class="w-5 h-5"></i>
         </button>
         
         <!-- Flag / Bookmark Button -->
-        <button id="btn-flag" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition" title="Bookmark Question">
+        <button id="btn-flag" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Bookmark Question">
           <i data-lucide="bookmark" class="w-5 h-5"></i>
         </button>
         
         <!-- User Account / Sync Button -->
-        <button id="btn-auth-modal" class="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center transition" title="Account & Sync">
+        <button id="btn-auth-modal" class="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center transition shrink-0" title="Account & Sync">
           <div id="auth-avatar" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
             <i data-lucide="user" class="w-4 h-4"></i>
           </div>
