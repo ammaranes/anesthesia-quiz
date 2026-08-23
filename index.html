@@ -45,7 +45,7 @@
           <i data-lucide="layers" class="w-5 h-5"></i>
         </button>
         <div>
-          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[140px] sm:max-w-xs">Saudi Anesthesia Board QB Practice</h1>
+          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[150px] sm:max-w-xs">Question Bank</h1>
           <p id="deck-progress-text" class="text-xs text-emerald-400">0 / 0 Answered</p>
         </div>
       </div>
@@ -86,8 +86,8 @@
       <div class="w-16 h-16 bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700">
         <i data-lucide="folder-open" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-xl font-bold text-slate-100 mb-2">No Quizzes Available</h2>
-      <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">No question banks found. Please ensure your deck files exist in the decks/ directory.</p>
+      <h2 class="text-xl font-bold text-slate-100 mb-2">No Question Bank Loaded</h2>
+      <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">Select a module from the menu to start practicing.</p>
     </div>
 
     <!-- Active Question View -->
@@ -117,9 +117,9 @@
       </div>
     </div>
 
-    <!-- Navigation Bottom Bar -->
-    <footer id="quiz-footer" class="sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-4 safe-bottom border-t border-slate-800/80">
-      <div class="flex items-center justify-between space-x-3">
+    <!-- Navigation Bottom Bar with Main Page Legal Links -->
+    <footer id="quiz-footer" class="sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-3 safe-bottom border-t border-slate-800/80">
+      <div class="flex items-center justify-between space-x-3 mb-2.5">
         <button id="btn-prev" class="flex-1 py-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 border border-slate-800 rounded-xl font-semibold text-sm flex items-center justify-center text-slate-300 transition">
           <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
         </button>
@@ -130,37 +130,29 @@
           Next <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
         </button>
       </div>
+
+      <!-- Persistent Footer Links -->
+      <div class="flex items-center justify-center space-x-3 text-[11px] text-slate-500 pt-0.5">
+        <a href="privacy.html" class="hover:text-slate-300 transition">Privacy Policy</a>
+        <span>•</span>
+        <a href="terms.html" class="hover:text-slate-300 transition">Terms of Service</a>
+      </div>
     </footer>
   </main>
 
-  <!-- Deck Switcher Modal -->
+  <!-- Locked-Down Deck Switcher Modal -->
   <div id="modal-decks" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-        <h3 class="font-bold text-slate-100">Manage Question Banks</h3>
+        <div>
+          <h3 class="font-bold text-slate-100">Saudi Board Question Banks</h3>
+          <p class="text-[11px] text-slate-400">Select a subspecialty module to practice</p>
+        </div>
         <button id="btn-close-decks" class="p-1 text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
       <div id="deck-list" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
-    </div>
-  </div>
-
-  <!-- Rename Deck Modal -->
-  <div id="modal-rename" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-5 shadow-2xl flex flex-col">
-      <div class="flex items-center justify-between mb-3">
-        <h4 class="font-bold text-slate-100 text-sm">Rename Quiz</h4>
-        <button id="btn-close-rename" class="p-1 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-      <p class="text-xs text-slate-400 mb-3">Enter a new display title for this quiz bank:</p>
-      <input type="text" id="input-rename-title" class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm mb-4 focus:border-blue-500 focus:outline-none" />
-      <div class="flex items-center space-x-2">
-        <button id="btn-cancel-rename" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition">Cancel</button>
-        <button id="btn-confirm-rename" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition">Save Title</button>
-      </div>
     </div>
   </div>
 
@@ -236,9 +228,13 @@
         </form>
 
         <div class="flex items-center justify-between text-[11px] text-slate-500 mt-3 px-1">
-  <button id="btn-forgot-password" type="button" class="hover:text-blue-400 transition">Forgot password?</button>
-  <a href="privacy.html" class="hover:text-slate-300 underline transition">Privacy Policy</a>
-</div>
+          <button id="btn-forgot-password" type="button" class="hover:text-blue-400 transition">Forgot password?</button>
+          <div class="space-x-2">
+            <a href="privacy.html" class="hover:text-slate-300 underline transition">Privacy</a>
+            <span>•</span>
+            <a href="terms.html" class="hover:text-slate-300 underline transition">Terms</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -261,7 +257,6 @@
     let db = null;
     let syncUnsubscribe = null;
     let currentUser = null;
-    let editingDeckId = null;
     let authMode = 'signin';
 
     try {
@@ -272,34 +267,18 @@
       console.warn("Firebase initialization warning:", e);
     }
 
-    // --- State Initialization with Registry ---
-    const BASE_OFFICIAL_DECKS = window.OFFICIAL_DECKS || {};
+    // --- State Initialization with Locked Official Registry ---
+    const OFFICIAL_DECKS = window.OFFICIAL_DECKS || {};
 
     let state = {
-      decks: JSON.parse(JSON.stringify(BASE_OFFICIAL_DECKS)),
-      currentDeckId: Object.keys(BASE_OFFICIAL_DECKS)[0] || null,
+      decks: OFFICIAL_DECKS,
+      currentDeckId: Object.keys(OFFICIAL_DECKS)[0] || null,
       userProgress: {}
     };
-
-    // Load Local Storage Cache
-    const savedDecks = localStorage.getItem('anesthesia_user_decks');
-    if (savedDecks) {
-      try {
-        const parsed = JSON.parse(savedDecks);
-        Object.keys(BASE_OFFICIAL_DECKS).forEach(k => {
-          if (!parsed[k]) parsed[k] = BASE_OFFICIAL_DECKS[k];
-        });
-        state.decks = parsed;
-      } catch (e) {}
-    }
 
     const savedProgress = localStorage.getItem('anesthesia_user_progress');
     if (savedProgress) {
       try { state.userProgress = JSON.parse(savedProgress); } catch (e) {}
-    }
-
-    if (!state.currentDeckId || !state.decks[state.currentDeckId]) {
-      state.currentDeckId = Object.keys(state.decks)[0] || null;
     }
 
     // --- Authentication & User-Specific Sync ---
@@ -350,18 +329,12 @@
       syncUnsubscribe = userDocRef.onSnapshot((doc) => {
         if (doc.exists) {
           const cloudData = doc.data();
-          if (cloudData.decks && Object.keys(cloudData.decks).length > 0) {
-            state.decks = Object.assign(JSON.parse(JSON.stringify(BASE_OFFICIAL_DECKS)), cloudData.decks);
-          }
           if (cloudData.userProgress) {
             state.userProgress = cloudData.userProgress;
           }
           if (cloudData.currentDeckId && state.decks[cloudData.currentDeckId]) {
             state.currentDeckId = cloudData.currentDeckId;
-          } else {
-            state.currentDeckId = Object.keys(state.decks)[0] || null;
           }
-          localStorage.setItem('anesthesia_user_decks', JSON.stringify(state.decks));
           localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
           render();
         } else {
@@ -373,7 +346,6 @@
     function pushStateToCloud() {
       if (!db || !currentUser) return;
       db.collection('users').doc(currentUser.uid).set({
-        decks: state.decks,
         userProgress: state.userProgress,
         currentDeckId: state.currentDeckId,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -486,58 +458,6 @@
       }
     }
 
-    // --- Deck Editing & Deletion Handlers ---
-    window.openRenameModal = function(deckId, e) {
-      if (e) e.stopPropagation();
-      editingDeckId = deckId;
-      const deck = state.decks[deckId];
-      if (!deck) return;
-      
-      document.getElementById('input-rename-title').value = deck.title;
-      document.getElementById('modal-rename').classList.remove('hidden');
-      document.getElementById('input-rename-title').focus();
-    };
-
-    window.handleDeleteDeck = function(deckId, e) {
-      if (e) e.stopPropagation();
-      const deck = state.decks[deckId];
-      if (!deck) return;
-
-      const confirmDelete = confirm(`Are you sure you want to delete "${deck.title}"? All progress for this quiz will be permanently removed.`);
-      if (!confirmDelete) return;
-
-      delete state.decks[deckId];
-      if (state.userProgress[deckId]) delete state.userProgress[deckId];
-
-      if (state.currentDeckId === deckId) {
-        state.currentDeckId = Object.keys(state.decks)[0] || null;
-      }
-
-      saveState();
-      renderDeckList();
-    };
-
-    document.getElementById('btn-confirm-rename').onclick = () => {
-      const newTitle = document.getElementById('input-rename-title').value.trim();
-      if (newTitle && editingDeckId && state.decks[editingDeckId]) {
-        state.decks[editingDeckId].title = newTitle;
-        saveState();
-        renderDeckList();
-      }
-      document.getElementById('modal-rename').classList.add('hidden');
-      editingDeckId = null;
-    };
-
-    document.getElementById('btn-cancel-rename').onclick = () => {
-      document.getElementById('modal-rename').classList.add('hidden');
-      editingDeckId = null;
-    };
-
-    document.getElementById('btn-close-rename').onclick = () => {
-      document.getElementById('modal-rename').classList.add('hidden');
-      editingDeckId = null;
-    };
-
     // --- Shuffle Engine (Fisher-Yates) ---
     function generateShuffledIndices(length) {
       const arr = Array.from({ length }, (_, i) => i);
@@ -582,7 +502,6 @@
     }
 
     function saveState() {
-      localStorage.setItem('anesthesia_user_decks', JSON.stringify(state.decks));
       localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
       render();
       pushStateToCloud();
@@ -597,7 +516,7 @@
         document.getElementById('view-empty').classList.remove('hidden');
         document.getElementById('view-quiz').classList.add('hidden');
         document.getElementById('quiz-footer').classList.add('hidden');
-        document.getElementById('deck-title').textContent = 'No Deck Selected';
+        document.getElementById('deck-title').textContent = 'Saudi Anesthesia Board QB';
         document.getElementById('deck-progress-text').textContent = '0 / 0 Answered';
         document.getElementById('progress-bar-fill').style.width = '0%';
         return;
@@ -704,13 +623,14 @@
       saveState();
     }
 
+    // --- Locked-Down Deck Switcher ---
     function renderDeckList() {
       const list = document.getElementById('deck-list');
       list.innerHTML = '';
 
       const deckKeys = Object.keys(state.decks);
       if (deckKeys.length === 0) {
-        list.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">No question banks found.</div>`;
+        list.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">No question banks found. Please verify your script imports.</div>`;
         return;
       }
 
@@ -718,27 +638,39 @@
         const deck = state.decks[id];
         const progress = state.userProgress[id] || { answers: {} };
         const answered = Object.keys(progress.answers || {}).length;
+        const total = deck.questions.length;
         const isCurrent = id === state.currentDeckId;
 
+        let correct = 0;
+        Object.entries(progress.answers || {}).forEach(([idx, ans]) => {
+          if (deck.questions[idx] && deck.questions[idx].correctAnswer === ans) correct++;
+        });
+        const acc = answered > 0 ? Math.round((correct / answered) * 100) : null;
+
         const item = document.createElement('div');
-        item.className = `p-3 rounded-xl border flex items-center justify-between transition ${isCurrent ? 'bg-blue-600/10 border-blue-500/50 text-blue-200' : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 text-slate-300'}`;
+        item.className = `p-3.5 rounded-xl border flex items-center justify-between transition cursor-pointer ${
+          isCurrent 
+            ? 'bg-blue-600/15 border-blue-500/60 text-blue-200 shadow-sm' 
+            : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 text-slate-300'
+        }`;
         
         item.innerHTML = `
-          <div class="flex-1 min-w-0 cursor-pointer pr-2">
-            <div class="font-bold text-sm truncate">${deck.title}</div>
-            <div class="text-xs text-slate-400 mt-0.5">${answered}/${deck.questions.length} completed</div>
+          <div class="flex-1 min-w-0 pr-3">
+            <div class="font-bold text-sm truncate text-slate-100">${deck.title}</div>
+            <div class="text-xs text-slate-400 mt-0.5 flex items-center space-x-2">
+              <span>${answered}/${total} questions</span>
+              ${acc !== null ? `<span>•</span><span class="${acc >= 75 ? 'text-emerald-400' : 'text-amber-400'}">${acc}% accuracy</span>` : ''}
+            </div>
           </div>
-          <div class="flex items-center space-x-1 shrink-0">
-            <button class="p-2 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-700/60 transition" title="Rename" onclick="openRenameModal('${id}', event)">
-              <i data-lucide="pencil" class="w-4 h-4"></i>
-            </button>
-            <button class="p-2 text-slate-400 hover:text-rose-400 rounded-lg active:bg-slate-700/60 transition" title="Delete" onclick="handleDeleteDeck('${id}', event)">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+          <div class="shrink-0">
+            ${isCurrent 
+              ? `<span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 border border-blue-400/40 text-blue-300 rounded-md">Active</span>` 
+              : `<i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>`
+            }
           </div>
         `;
 
-        item.querySelector('.flex-1').onclick = () => {
+        item.onclick = () => {
           state.currentDeckId = id;
           saveState();
           document.getElementById('modal-decks').classList.add('hidden');
