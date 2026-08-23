@@ -41,21 +41,24 @@
 
   <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 safe-top">
-    <div class="flex items-center space-x-3">
-      <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800" title="Question Banks">
-      <i data-lucide="layers" class="w-5 h-5"></i>
-    </button>
-  
-  <!-- App Logo Icon -->
-  <img src="logo.svg" alt="Logo" class="w-8 h-8 rounded-lg shadow border border-slate-700/50" />
-    <div>
-      <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate max-w-[130px] sm:max-w-xs">Question Bank</h1>
-      <p id="deck-progress-text" class="text-xs text-emerald-400">0 / 0 Answered</p>
-    </div>
-  </div>
+    <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
       
-      <!-- Top Action Controls -->
-      <div class="flex items-center space-x-1 sm:space-x-2">
+      <!-- Left Section: Menu, Logo, and Title -->
+      <div class="flex items-center space-x-2.5 min-w-0 flex-1">
+        <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 shrink-0" title="Question Banks">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </button>
+        
+        <img src="logo.svg" alt="App Logo" class="w-8 h-8 rounded-lg border border-slate-700/60 shrink-0 object-contain" />
+
+        <div class="min-w-0 flex-1">
+          <h1 id="deck-title" class="font-bold text-sm text-slate-100 truncate">Saudi Anesthesia Board QB Practice</h1>
+          <p id="deck-progress-text" class="text-xs text-emerald-400 truncate">0 / 0 Answered</p>
+        </div>
+      </div>
+      
+      <!-- Right Section: Action Controls (Locked Horizontal) -->
+      <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
         <!-- Shuffle Toggle Button -->
         <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition" title="Toggle Random Order">
           <i data-lucide="shuffle" class="w-5 h-5"></i>
@@ -74,6 +77,7 @@
           <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 -ml-1.5 -mt-3 hidden"></span>
         </button>
       </div>
+
     </div>
     
     <!-- Linear Progress Bar -->
