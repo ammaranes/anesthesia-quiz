@@ -262,6 +262,17 @@
 
   <!-- Application Logic -->
   <script>
+    // 🛠️ Formatting Helper
+    function formatMarkdown(text) {
+    if (!text) return '';
+    return text
+    // Converts **bold** to <b>bold</b>
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-100">$1</strong>')
+    // Converts *italic* to <i>italic</i>
+    .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+    // Converts line breaks to <br/>
+    .replace(/\n/g, '<br/>');
+    }
     // ==========================================
     // 🔑 FIREBASE CONFIGURATION
     // ==========================================
@@ -627,8 +638,8 @@
       if (selectedAnswer && (q.explanation || q.correctAnswer)) {
         expBox.classList.remove('hidden');
         document.getElementById('explanation-content').innerHTML = `
-          <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
-          <div class="mt-1 text-slate-300">${q.explanation || 'No additional reference provided.'}</div>
+        <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
+        <div class="mt-1 text-slate-300">${formatMarkdown(q.explanation) || 'No rationale provided.'}</div>   
         `;
       } else {
         expBox.classList.add('hidden');
