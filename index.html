@@ -53,11 +53,9 @@
         <img src="logo.svg" alt="App Logo" class="w-8 h-8 rounded-lg border border-slate-700/60 shrink-0 object-contain" />
 
         <div class="min-w-0 flex-1 flex flex-col justify-center">
-          <!-- Permanent App Name (Satisfies Google OAuth Crawler) -->
           <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400 truncate leading-tight">
             Saudi Anesthesia Board QB Practice
           </span>
-          <!-- Dynamic Current Deck Title -->
           <div class="flex items-center space-x-2 truncate">
             <h1 id="deck-title" class="font-bold text-xs sm:text-sm text-slate-100 truncate leading-snug">
               Question Bank
@@ -75,6 +73,11 @@
         <!-- Shuffle Toggle Button -->
         <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Toggle Random Order">
           <i data-lucide="shuffle" class="w-5 h-5"></i>
+        </button>
+
+        <!-- SRS Due Mode Button -->
+        <button id="btn-srs-filter" class="p-2 text-slate-400 hover:text-emerald-400 rounded-lg active:bg-slate-800 transition shrink-0" title="SRS Due Review Mode">
+          <i data-lucide="brain" class="w-5 h-5"></i>
         </button>
         
         <!-- Flag / Bookmark Button -->
@@ -117,6 +120,7 @@
         <div class="flex items-center space-x-2">
           <span id="question-number-badge" class="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-md text-slate-300">Question 1</span>
           <span id="shuffle-mode-tag" class="hidden px-2 py-0.5 bg-indigo-950/80 border border-indigo-700/50 text-indigo-300 rounded text-[10px] uppercase font-bold tracking-wider">Shuffled</span>
+          <span id="srs-mode-tag" class="hidden px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 rounded text-[10px] uppercase font-bold tracking-wider">SRS Due Mode</span>
         </div>
         <span id="score-badge" class="text-slate-400">Accuracy: 100%</span>
       </div>
@@ -134,7 +138,35 @@
         <div class="flex items-center text-emerald-400 font-bold mb-2">
           <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Reference & Rationale
         </div>
+        
         <div id="explanation-content" class="leading-relaxed space-y-2"></div>
+        <div id="explanation-images-container" class="mt-4 space-y-3 hidden"></div>
+
+        <!-- Anki SRS Recall Bar (Nested Inside) -->
+        <div class="mt-5 pt-4 border-t border-slate-800">
+          <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center justify-between">
+            <span>Rate Recall (Spaced Repetition):</span>
+            <span id="srs-status-tag" class="text-[10px] text-slate-500">Not rated yet</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="window.rateRecall('again')" class="py-2 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-800/60 text-rose-300 font-bold text-xs flex flex-col items-center transition active:scale-95">
+              <span>Again</span>
+              <span class="text-[9px] font-normal text-rose-400/80">1 Day</span>
+            </button>
+            <button type="button" onclick="window.rateRecall('hard')" class="py-2 rounded-lg bg-amber-950/60 hover:bg-amber-900 border border-amber-800/60 text-amber-300 font-bold text-xs flex flex-col items-center transition active:scale-95">
+              <span>Hard</span>
+              <span class="text-[9px] font-normal text-amber-400/80">Slower</span>
+            </button>
+            <button type="button" onclick="window.rateRecall('good')" class="py-2 rounded-lg bg-blue-950/60 hover:bg-blue-900 border border-blue-800/60 text-blue-300 font-bold text-xs flex flex-col items-center transition active:scale-95">
+              <span>Good</span>
+              <span class="text-[9px] font-normal text-blue-400/80">Standard</span>
+            </button>
+            <button type="button" onclick="window.rateRecall('easy')" class="py-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/60 text-emerald-300 font-bold text-xs flex flex-col items-center transition active:scale-95">
+              <span>Easy</span>
+              <span class="text-[9px] font-normal text-emerald-400/80">4-7 Days</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -161,7 +193,7 @@
     </footer>
   </main>
 
-  <!-- Locked-Down Deck Switcher Modal -->
+  <!-- Deck Switcher Modal -->
   <div id="modal-decks" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -203,7 +235,7 @@
         </button>
       </div>
 
-      <!-- State: Logged Out (Google + Email/Password) -->
+      <!-- State: Logged Out -->
       <div id="auth-state-logged-out" class="flex flex-col">
         <p class="text-xs text-slate-400 mb-4 leading-relaxed">
           Sign in or create an account to synchronize your progress and bookmarks across your devices.
@@ -222,13 +254,13 @@
           <div class="flex-1 border-t border-slate-800"></div>
         </div>
 
-        <!-- Auth Mode Tabs (Sign In / Register) -->
+        <!-- Auth Mode Tabs -->
         <div class="flex p-1 bg-slate-950 rounded-xl border border-slate-800 mb-4">
           <button id="tab-auth-signin" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white">Sign In</button>
           <button id="tab-auth-signup" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200">Create Account</button>
         </div>
 
-        <!-- Error Notification Box -->
+        <!-- Error Box -->
         <div id="auth-error-box" class="hidden mb-4 p-3 bg-rose-950/50 border border-rose-800/60 rounded-xl text-xs text-rose-300 leading-relaxed"></div>
 
         <!-- Email & Password Form -->
@@ -264,15 +296,50 @@
   <script>
     // 🛠️ Formatting Helper
     function formatMarkdown(text) {
-    if (!text) return '';
-    return text
-    // Converts **bold** to <b>bold</b>
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-100">$1</strong>')
-    // Converts *italic* to <i>italic</i>
-    .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-    // Converts line breaks to <br/>
-    .replace(/\n/g, '<br/>');
+      if (!text) return '';
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-100">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+        .replace(/\n/g, '<br/>');
     }
+
+    // 🧠 Spaced Repetition (SM-2 Inspired) Calculator
+    function calculateNextSRS(currentSRS, rating) {
+      let { interval = 0, repetitions = 0, easeFactor = 2.5 } = currentSRS || {};
+      const now = new Date();
+
+      if (rating === 'again') {
+        repetitions = 0;
+        interval = 1;
+        easeFactor = Math.max(1.3, easeFactor - 0.2);
+      } else if (rating === 'hard') {
+        interval = Math.max(1, Math.round(interval * 1.2)) || 1;
+        easeFactor = Math.max(1.3, easeFactor - 0.15);
+      } else if (rating === 'good') {
+        if (repetitions === 0) interval = 1;
+        else if (repetitions === 1) interval = 3;
+        else interval = Math.round(interval * easeFactor);
+        repetitions += 1;
+      } else if (rating === 'easy') {
+        if (repetitions === 0) interval = 4;
+        else if (repetitions === 1) interval = 7;
+        else interval = Math.round(interval * easeFactor * 1.3);
+        repetitions += 1;
+        easeFactor += 0.15;
+      }
+
+      const nextDue = new Date();
+      nextDue.setDate(now.getDate() + interval);
+
+      return {
+        interval,
+        repetitions,
+        easeFactor: parseFloat(easeFactor.toFixed(2)),
+        dueDate: nextDue.toISOString(),
+        lastReviewed: now.toISOString()
+      };
+    }
+
     // ==========================================
     // 🔑 FIREBASE CONFIGURATION
     // ==========================================
@@ -490,7 +557,7 @@
       }
     }
 
-    // --- Shuffle Engine (Fisher-Yates) ---
+    // --- Shuffle & SRS Engines ---
     function generateShuffledIndices(length) {
       const arr = Array.from({ length }, (_, i) => i);
       for (let i = arr.length - 1; i > 0; i--) {
@@ -505,6 +572,7 @@
       if (!currentDeck || currentDeck.questions.length === 0) return;
 
       const progress = getProgress();
+      progress.isSRSMode = false;
       progress.isShuffled = !progress.isShuffled;
 
       if (progress.isShuffled) {
@@ -519,15 +587,51 @@
       saveState();
     }
 
+    function toggleSRSMode() {
+      const currentDeck = state.decks[state.currentDeckId];
+      if (!currentDeck || currentDeck.questions.length === 0) return;
+
+      const progress = getProgress();
+      progress.isSRSMode = !progress.isSRSMode;
+      progress.isShuffled = false;
+
+      if (progress.isSRSMode) {
+        const now = new Date();
+        const dueIndices = [];
+        currentDeck.questions.forEach((_, idx) => {
+          const srs = (progress.srs || {})[idx];
+          if (!srs || !srs.dueDate || new Date(srs.dueDate) <= now) {
+            dueIndices.push(idx);
+          }
+        });
+
+        if (dueIndices.length === 0) {
+          alert('🎉 Excellent! No questions are due for review in this bank today.');
+          progress.isSRSMode = false;
+          progress.order = [];
+        } else {
+          progress.order = dueIndices;
+          progress.currentIndex = 0;
+        }
+      } else {
+        progress.order = [];
+        progress.currentIndex = 0;
+      }
+
+      saveState();
+    }
+
     function getProgress() {
-      if (!state.currentDeckId) return { currentIndex: 0, answers: {}, flags: [], isShuffled: false, order: [] };
+      if (!state.currentDeckId) return { currentIndex: 0, answers: {}, flags: [], isShuffled: false, isSRSMode: false, order: [], srs: {} };
       if (!state.userProgress[state.currentDeckId]) {
         state.userProgress[state.currentDeckId] = {
           currentIndex: 0,
           answers: {},
           flags: [],
           isShuffled: false,
-          order: []
+          isSRSMode: false,
+          order: [],
+          srs: {}
         };
       }
       return state.userProgress[state.currentDeckId];
@@ -562,9 +666,9 @@
       const totalQ = currentDeck.questions.length;
       const qPointer = progress.currentIndex || 0;
 
-      const actualIndex = (progress.isShuffled && progress.order && progress.order.length === totalQ)
-        ? progress.order[qPointer]
-        : qPointer;
+      const hasCustomOrder = progress.order && progress.order.length > 0;
+      const actualIndex = hasCustomOrder ? progress.order[qPointer] : qPointer;
+      const activeTotal = hasCustomOrder ? progress.order.length : totalQ;
 
       const q = currentDeck.questions[actualIndex] || currentDeck.questions[0];
 
@@ -585,16 +689,29 @@
       const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
       document.getElementById('score-badge').textContent = `Accuracy: ${acc}%`;
 
-      // Update Shuffle Button State
+      // Update Shuffle & SRS Tags / Buttons
       const shuffleBtn = document.getElementById('btn-shuffle');
       const shuffleTag = document.getElementById('shuffle-mode-tag');
+      const srsBtn = document.getElementById('btn-srs-filter');
+      const srsTag = document.getElementById('srs-mode-tag');
+
       if (progress.isShuffled) {
-        shuffleBtn.className = 'p-2 text-indigo-400 bg-indigo-950/60 border border-indigo-800/60 rounded-lg active:bg-slate-800 transition';
+        shuffleBtn.className = 'p-2 text-indigo-400 bg-indigo-950/60 border border-indigo-800/60 rounded-lg active:bg-slate-800 transition shrink-0';
         shuffleTag.classList.remove('hidden');
-        document.getElementById('question-number-badge').textContent = `Question ${qPointer + 1} of ${totalQ} (Original #${actualIndex + 1})`;
-      } else {
-        shuffleBtn.className = 'p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition';
+        srsTag.classList.add('hidden');
+        srsBtn.className = 'p-2 text-slate-400 hover:text-emerald-400 rounded-lg active:bg-slate-800 transition shrink-0';
+        document.getElementById('question-number-badge').textContent = `Question ${qPointer + 1} of ${activeTotal} (Original #${actualIndex + 1})`;
+      } else if (progress.isSRSMode) {
+        srsBtn.className = 'p-2 text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 rounded-lg active:bg-slate-800 transition shrink-0';
+        srsTag.classList.remove('hidden');
         shuffleTag.classList.add('hidden');
+        shuffleBtn.className = 'p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition shrink-0';
+        document.getElementById('question-number-badge').textContent = `SRS Due ${qPointer + 1} of ${activeTotal} (Original #${actualIndex + 1})`;
+      } else {
+        shuffleBtn.className = 'p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition shrink-0';
+        srsBtn.className = 'p-2 text-slate-400 hover:text-emerald-400 rounded-lg active:bg-slate-800 transition shrink-0';
+        shuffleTag.classList.add('hidden');
+        srsTag.classList.add('hidden');
         document.getElementById('question-number-badge').textContent = `Question ${qPointer + 1} of ${totalQ}`;
       }
 
@@ -604,8 +721,8 @@
       const isFlagged = (progress.flags || []).includes(actualIndex);
       const flagBtn = document.getElementById('btn-flag');
       flagBtn.className = isFlagged 
-        ? 'p-2 text-amber-400 bg-amber-950/40 border border-amber-800/50 rounded-lg active:bg-slate-800' 
-        : 'p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800';
+        ? 'p-2 text-amber-400 bg-amber-950/40 border border-amber-800/50 rounded-lg active:bg-slate-800 transition shrink-0' 
+        : 'p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition shrink-0';
 
       // Render Options
       const optionsContainer = document.getElementById('options-container');
@@ -635,15 +752,47 @@
 
       // Explanation Box
       const expBox = document.getElementById('explanation-box');
+      const expImgContainer = document.getElementById('explanation-images-container');
+
       if (selectedAnswer && (q.explanation || q.correctAnswer)) {
         expBox.classList.remove('hidden');
         document.getElementById('explanation-content').innerHTML = `
-        <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
-        <div class="mt-1 text-slate-300">${formatMarkdown(q.explanation) || 'No rationale provided.'}</div>   
+          <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
+          <div class="mt-1 text-slate-300">${formatMarkdown(q.explanation) || 'No rationale provided.'}</div>   
         `;
+
+        // 🧠 Update SRS Status Tag
+        const srsData = (progress.srs || {})[actualIndex];
+        const statusTag = document.getElementById('srs-status-tag');
+        if (statusTag) {
+          if (srsData && srsData.dueDate) {
+            const daysLeft = Math.ceil((new Date(srsData.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+            statusTag.textContent = daysLeft <= 0 ? 'Due for Review Today' : `Due in ${daysLeft}d (Interval: ${srsData.interval}d)`;
+            statusTag.className = daysLeft <= 0 ? 'text-[10px] text-amber-400 font-bold' : 'text-[10px] text-emerald-400 font-medium';
+          } else {
+            statusTag.textContent = 'Not rated yet';
+            statusTag.className = 'text-[10px] text-slate-500';
+          }
+        }
+
+        // Render explanation figures if present
+        if (q.explanationImages && q.explanationImages.length > 0) {
+          expImgContainer.innerHTML = '';
+          q.explanationImages.forEach(src => {
+            const cleanSrc = src.startsWith('/') ? src.slice(1) : src;
+            const img = document.createElement('img');
+            img.src = cleanSrc;
+            img.className = 'max-h-72 w-auto mx-auto rounded-xl border border-slate-700 bg-white/5 p-1';
+            expImgContainer.appendChild(img);
+          });
+          expImgContainer.classList.remove('hidden');
+        } else if (expImgContainer) {
+          expImgContainer.classList.add('hidden');
+        }
       } else {
         expBox.classList.add('hidden');
       }
+
       lucide.createIcons();
     }
 
@@ -655,7 +804,21 @@
       saveState();
     }
 
-    // --- Locked-Down Deck Switcher ---
+    // 🧠 Handle SRS Recall Ratings
+    window.rateRecall = (rating) => {
+      const d = state.decks[state.currentDeckId];
+      if (!d) return;
+      const progress = getProgress();
+      const hasCustomOrder = progress.order && progress.order.length > 0;
+      const idx = hasCustomOrder ? progress.order[progress.currentIndex] : progress.currentIndex;
+
+      progress.srs = progress.srs || {};
+      progress.srs[idx] = calculateNextSRS(progress.srs[idx], rating);
+      
+      saveState();
+    };
+   
+    // --- Deck Switcher Modal ---
     function renderDeckList() {
       const list = document.getElementById('deck-list');
       list.innerHTML = '';
@@ -714,14 +877,15 @@
     }
 
     // --- Navigation & Control Events ---
-    document.getElementById('btn-shuffle').onclick = () => {
-      toggleShuffleMode();
-    };
+    document.getElementById('btn-shuffle').onclick = () => toggleShuffleMode();
+    document.getElementById('btn-srs-filter').onclick = () => toggleSRSMode();
 
     document.getElementById('btn-next').onclick = () => {
       const p = getProgress();
       const d = state.decks[state.currentDeckId];
-      if (p && d && p.currentIndex < d.questions.length - 1) {
+      if (!p || !d) return;
+      const maxLen = (p.order && p.order.length > 0) ? p.order.length : d.questions.length;
+      if (p.currentIndex < maxLen - 1) {
         p.currentIndex++;
         saveState();
       }
@@ -739,7 +903,7 @@
       const p = getProgress();
       const d = state.decks[state.currentDeckId];
       if (p && d) {
-        const actualIndex = (p.isShuffled && p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
+        const actualIndex = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
         const q = d.questions[actualIndex];
         handleSelectOption(actualIndex, q.correctAnswer || 'A');
       }
@@ -750,7 +914,7 @@
       const d = state.decks[state.currentDeckId];
       if (!p || !d) return;
       
-      const actualIndex = (p.isShuffled && p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
+      const actualIndex = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
       p.flags = p.flags || [];
       const idx = p.flags.indexOf(actualIndex);
       if (idx > -1) p.flags.splice(idx, 1);
