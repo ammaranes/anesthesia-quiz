@@ -19,19 +19,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
-  <!-- ========================================== -->
-  <!-- 📚 OFFICIAL DECK REGISTRY SCRIPTS          -->
-  <!-- ========================================== -->
-  <script src="decks/core_anesthesia.js"></script>
-  <script src="decks/regional_anesthesia.js"></script>
-  <script src="decks/airway.js"></script>
-  <script src="decks/equip.js"></script>
-  <script src="decks/hemodynamics.js"></script>
-  <script src="decks/neuroanesthesia.js"></script>
-  <script src="decks/obs.js"></script>
-  <script src="decks/pediatric.js"></script>
-  <script src="decks/pharmacology.js"></script>
-
   <style>
     body { -webkit-tap-highlight-color: transparent; }
     .safe-top { padding-top: env(safe-area-inset-top); }
@@ -44,7 +31,7 @@
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 safe-top">
     <div class="max-w-4xl mx-auto px-4 py-2 min-h-[3.75rem] flex items-center justify-between gap-3">
       
-      <!-- Left Section: Menu, Logo, and Dual-Line Brand/Deck Title -->
+      <!-- Left: Menu, Logo, Dual-Line Title -->
       <div class="flex items-center space-x-2.5 min-w-0 flex-1">
         <button id="btn-menu" class="p-2 text-slate-400 hover:text-white rounded-lg active:bg-slate-800 shrink-0" title="Question Banks">
           <i data-lucide="layers" class="w-5 h-5"></i>
@@ -58,7 +45,7 @@
           </span>
           <div class="flex items-center space-x-2 truncate">
             <h1 id="deck-title" class="font-bold text-xs sm:text-sm text-slate-100 truncate leading-snug">
-              Question Bank
+              Loading Modules...
             </h1>
             <span class="text-slate-600 text-xs">•</span>
             <p id="deck-progress-text" class="text-[11px] font-medium text-emerald-400 truncate leading-snug">
@@ -68,29 +55,24 @@
         </div>
       </div>
       
-      <!-- Right Section: Action Controls -->
+      <!-- Right: Action Controls -->
       <div class="flex items-center space-x-1 sm:space-x-2 shrink-0">
-        <!-- Shuffle Toggle Button -->
         <button id="btn-shuffle" class="p-2 text-slate-400 hover:text-indigo-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Toggle Random Order">
           <i data-lucide="shuffle" class="w-5 h-5"></i>
         </button>
 
-        <!-- SRS Due Mode Button -->
         <button id="btn-srs-filter" class="p-2 text-slate-400 hover:text-emerald-400 rounded-lg active:bg-slate-800 transition shrink-0" title="SRS Due Review Mode">
           <i data-lucide="brain" class="w-5 h-5"></i>
         </button>
         
-        <!-- Search Button -->
         <button id="btn-search" class="p-2 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Search (Ctrl + K)">
           <i data-lucide="search" class="w-5 h-5"></i>
         </button>
         
-        <!-- Flag / Bookmark Button -->
         <button id="btn-flag" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition shrink-0" title="Bookmark Question">
           <i data-lucide="bookmark" class="w-5 h-5"></i>
         </button>
         
-        <!-- User Account / Sync Button -->
         <button id="btn-auth-modal" class="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg active:bg-slate-800 flex items-center transition shrink-0" title="Account & Sync">
           <div id="auth-avatar" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
             <i data-lucide="user" class="w-4 h-4"></i>
@@ -107,7 +89,7 @@
     </div>
   </header>
 
-  <!-- Main Question Container -->
+  <!-- Main Content Container -->
   <main class="flex-1 max-w-3xl w-full mx-auto p-4 flex flex-col justify-between">
     
     <!-- Empty State -->
@@ -115,7 +97,7 @@
       <div class="w-16 h-16 bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-700">
         <i data-lucide="folder-open" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-xl font-bold text-slate-100 mb-2">No Question Bank Loaded</h2>
+      <h2 class="text-xl font-bold text-slate-100 mb-2">No Module Loaded</h2>
       <p class="text-sm text-slate-400 max-w-md mx-auto mb-6">Select a module from the menu to start practicing.</p>
     </div>
 
@@ -130,15 +112,18 @@
         <span id="score-badge" class="text-slate-400">Accuracy: 100%</span>
       </div>
 
-      <!-- Question Stem -->
+      <!-- Question Stem & Optional Stem Image -->
       <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm mb-4">
         <p id="question-stem" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed"></p>
+        <div id="stem-image-container" class="mt-4 hidden">
+          <img id="stem-image" src="" alt="Question Diagram" class="max-h-72 w-auto mx-auto rounded-xl border border-slate-700 bg-white/5 p-1" />
+        </div>
       </div>
 
       <!-- Options Container -->
       <div id="options-container" class="space-y-3 mb-6"></div>
 
-      <!-- Explanation & Reference Box -->
+      <!-- Explanation & Rationale Box -->
       <div id="explanation-box" class="hidden bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 mb-6 text-sm text-slate-300">
         <div class="flex items-center text-emerald-400 font-bold mb-2">
           <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Reference & Rationale
@@ -147,7 +132,7 @@
         <div id="explanation-content" class="leading-relaxed space-y-2"></div>
         <div id="explanation-images-container" class="mt-4 space-y-3 hidden"></div>
 
-        <!-- Anki SRS Recall Bar -->
+        <!-- Anki Spaced Repetition Bar -->
         <div class="mt-5 pt-4 border-t border-slate-800">
           <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center justify-between">
             <span>Rate Recall (Spaced Repetition):</span>
@@ -175,7 +160,7 @@
       </div>
     </div>
 
-    <!-- Navigation Bottom Bar with Legal Links -->
+    <!-- Navigation Footer -->
     <footer id="quiz-footer" class="sticky bottom-0 bg-slate-950/90 backdrop-blur pt-3 pb-3 safe-bottom border-t border-slate-800/80">
       <div class="flex items-center justify-between space-x-3 mb-2.5">
         <button id="btn-prev" class="flex-1 py-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 border border-slate-800 rounded-xl font-semibold text-sm flex items-center justify-center text-slate-300 transition">
@@ -189,7 +174,6 @@
         </button>
       </div>
 
-      <!-- Persistent Footer Links -->
       <div class="flex items-center justify-center space-x-3 text-[11px] text-slate-500 pt-0.5">
         <a href="https://ketofoldoc.com/privacy.html" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300 transition">Privacy Policy</a>
         <span>•</span>
@@ -202,7 +186,6 @@
   <div id="modal-search" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-12 sm:pt-20">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
       
-      <!-- Search Input Header -->
       <div class="p-4 border-b border-slate-800 flex items-center space-x-3 bg-slate-900/90">
         <i data-lucide="search" class="w-5 h-5 text-slate-400 shrink-0"></i>
         <input 
@@ -217,14 +200,12 @@
         </button>
       </div>
 
-      <!-- Search Results List -->
       <div id="search-results-list" class="p-4 overflow-y-auto space-y-2.5 flex-1 divide-y divide-slate-800/40">
         <div class="text-xs text-slate-500 text-center py-8">
-          Type at least 2 characters to search across all question banks...
+          Type at least 2 characters to search across all modules...
         </div>
       </div>
       
-      <!-- Footer Shortcut Hint -->
       <div class="px-4 py-2 bg-slate-950/50 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
         <span id="search-count-badge">0 results found</span>
         <span>Press <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">ESC</kbd> to close</span>
@@ -287,24 +268,20 @@
           <span>Continue with Google</span>
         </button>
 
-        <!-- Divider -->
         <div class="flex items-center my-2 mb-4">
           <div class="flex-1 border-t border-slate-800"></div>
           <span class="px-3 text-[11px] text-slate-500 font-medium uppercase tracking-wider">or with email</span>
           <div class="flex-1 border-t border-slate-800"></div>
         </div>
 
-        <!-- Auth Mode Tabs -->
         <div class="flex p-1 bg-slate-950 rounded-xl border border-slate-800 mb-4">
           <button id="tab-auth-signin" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white">Sign In</button>
           <button id="tab-auth-signup" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200">Create Account</button>
         </div>
 
-        <!-- Error Box -->
         <div id="auth-error-box" class="hidden mb-4 p-3 bg-rose-950/50 border border-rose-800/60 rounded-xl text-xs text-rose-300 leading-relaxed"></div>
 
-        <!-- Email & Password Form -->
-        <form id="form-email-auth" onsubmit="handleEmailAuth(event)" class="space-y-3">
+        <form id="form-email-auth" class="space-y-3">
           <div>
             <label class="block text-[11px] font-semibold text-slate-400 mb-1">Email Address</label>
             <input type="email" id="input-auth-email" required placeholder="doctor@example.com" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:border-blue-500 focus:outline-none" />
@@ -332,8 +309,10 @@
     </div>
   </div>
 
-  <!-- Application Logic -->
-  <script>
+  <!-- ES6 Application Logic -->
+  <script type="module">
+    import { allDecks } from './decks/index.js';
+
     // 🛠️ Formatting Helper
     function formatMarkdown(text) {
       if (!text) return '';
@@ -380,9 +359,12 @@
       };
     }
 
-    // ==========================================
-    // 🔑 FIREBASE CONFIGURATION
-    // ==========================================
+    // Build Decks Map from allDecks
+    const DECKS = {};
+    allDecks.forEach(d => {
+      DECKS[d.id] = d;
+    });
+
     const firebaseConfig = {
       apiKey: "AIzaSyDTBiUKXcQ6i_0qdygn6sEUflFOlERzQOs",
       authDomain: "qb-sync-e6294.firebaseapp.com",
@@ -392,43 +374,37 @@
       appId: "1:94979024020:web:687bd4c064b87ff1180081"
     };
 
-    let auth = null;
-    let db = null;
-    let syncUnsubscribe = null;
-    let currentUser = null;
-    let authMode = 'signin';
+    let auth = null, db = null, syncUnsubscribe = null, currentUser = null, authMode = 'signin';
 
     try {
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       db = firebase.firestore();
     } catch (e) {
-      console.warn("Firebase initialization warning:", e);
+      console.warn("Firebase Init:", e);
     }
 
-    // --- State Initialization with Locked Official Registry ---
-    const OFFICIAL_DECKS = window.OFFICIAL_DECKS || {};
+    const LOCAL_STORAGE_KEY = 'anesthesia_user_progress';
+    const FIRESTORE_COLLECTION = 'users';
 
     let state = {
-      decks: OFFICIAL_DECKS,
-      currentDeckId: Object.keys(OFFICIAL_DECKS)[0] || null,
+      decks: DECKS,
+      currentDeckId: Object.keys(DECKS)[0] || null,
       userProgress: {}
     };
 
-    const savedProgress = localStorage.getItem('anesthesia_user_progress');
+    const savedProgress = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedProgress) {
       try { state.userProgress = JSON.parse(savedProgress); } catch (e) {}
     }
 
-    // --- Authentication & User-Specific Sync ---
+    // --- Cloud Authentication & Sync ---
     if (auth) {
       auth.onAuthStateChanged((user) => {
         currentUser = user;
         updateAuthUI(user);
-
-        if (user) {
-          initUserCloudSync(user.uid);
-        } else {
+        if (user) initUserCloudSync(user.uid);
+        else {
           if (syncUnsubscribe) syncUnsubscribe();
           document.getElementById('sync-dot').classList.add('hidden');
         }
@@ -445,7 +421,6 @@
         loggedOutView.classList.add('hidden');
         document.getElementById('user-display-name').textContent = user.displayName || 'Doctor / Candidate';
         document.getElementById('user-display-email').textContent = user.email;
-        
         const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
         document.getElementById('user-display-avatar').textContent = initial;
         avatar.innerHTML = `<span class="text-blue-400 font-bold">${initial}</span>`;
@@ -460,21 +435,18 @@
     function initUserCloudSync(userId) {
       if (!db) return;
       document.getElementById('sync-dot').classList.remove('hidden');
-
       if (syncUnsubscribe) syncUnsubscribe();
 
-      const userDocRef = db.collection('users').doc(userId);
+      const userDocRef = db.collection(FIRESTORE_COLLECTION).doc(userId);
 
       syncUnsubscribe = userDocRef.onSnapshot((doc) => {
         if (doc.exists) {
           const cloudData = doc.data();
-          if (cloudData.userProgress) {
-            state.userProgress = cloudData.userProgress;
-          }
+          if (cloudData.userProgress) state.userProgress = cloudData.userProgress;
           if (cloudData.currentDeckId && state.decks[cloudData.currentDeckId]) {
             state.currentDeckId = cloudData.currentDeckId;
           }
-          localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.userProgress));
           render();
         } else {
           pushStateToCloud();
@@ -484,7 +456,7 @@
 
     function pushStateToCloud() {
       if (!db || !currentUser) return;
-      db.collection('users').doc(currentUser.uid).set({
+      db.collection(FIRESTORE_COLLECTION).doc(currentUser.uid).set({
         userProgress: state.userProgress,
         currentDeckId: state.currentDeckId,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -541,12 +513,9 @@
             matchScore += 5;
             matchSource = q.explanation;
           }
-          // Check Options
+          // Check Options (Key-Value Schema)
           else {
-            const optionValues = Array.isArray(q.options) 
-              ? q.options.map(o => o.text).join(' ')
-              : Object.values(q.options || {}).join(' ');
-
+            const optionValues = Object.values(q.options || {}).join(' ');
             if (optionValues.toLowerCase().includes(cleanQuery)) {
               matchScore += 3;
               matchSource = optionValues;
@@ -575,7 +544,7 @@
       searchResults.innerHTML = '';
 
       if (query.trim().length < 2) {
-        searchResults.innerHTML = `<div class="text-xs text-slate-500 text-center py-8">Type at least 2 characters to search across all questions...</div>`;
+        searchResults.innerHTML = `<div class="text-xs text-slate-500 text-center py-8">Type at least 2 characters to search across all modules...</div>`;
         searchCountBadge.textContent = '0 results found';
         return;
       }
@@ -637,113 +606,7 @@
       }
     });
 
-    // --- Email / Password Authentication Logic ---
-    function setAuthMode(mode) {
-      authMode = mode;
-      const tabSignIn = document.getElementById('tab-auth-signin');
-      const tabSignUp = document.getElementById('tab-auth-signup');
-      const btnSubmit = document.getElementById('btn-email-submit');
-      const errBox = document.getElementById('auth-error-box');
-
-      errBox.classList.add('hidden');
-
-      if (mode === 'signin') {
-        tabSignIn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white';
-        tabSignUp.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200';
-        btnSubmit.textContent = 'Sign In';
-      } else {
-        tabSignUp.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white';
-        tabSignIn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200';
-        btnSubmit.textContent = 'Create Account';
-      }
-    }
-
-    document.getElementById('tab-auth-signin').onclick = () => setAuthMode('signin');
-    document.getElementById('tab-auth-signup').onclick = () => setAuthMode('signup');
-
-    window.handleEmailAuth = function(e) {
-      e.preventDefault();
-      if (!auth) return;
-
-      const email = document.getElementById('input-auth-email').value.trim();
-      const password = document.getElementById('input-auth-password').value;
-      const errBox = document.getElementById('auth-error-box');
-      const btnSubmit = document.getElementById('btn-email-submit');
-
-      errBox.classList.add('hidden');
-      btnSubmit.disabled = true;
-      btnSubmit.textContent = 'Please wait...';
-
-      if (authMode === 'signup') {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(() => {
-            document.getElementById('modal-auth').classList.add('hidden');
-          })
-          .catch((err) => {
-            errBox.textContent = getFriendlyAuthError(err.code, err.message);
-            errBox.classList.remove('hidden');
-          })
-          .finally(() => {
-            btnSubmit.disabled = false;
-            btnSubmit.textContent = 'Create Account';
-          });
-      } else {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => {
-            document.getElementById('modal-auth').classList.add('hidden');
-          })
-          .catch((err) => {
-            errBox.textContent = getFriendlyAuthError(err.code, err.message);
-            errBox.classList.remove('hidden');
-          })
-          .finally(() => {
-            btnSubmit.disabled = false;
-            btnSubmit.textContent = 'Sign In';
-          });
-      }
-    };
-
-    document.getElementById('btn-forgot-password').onclick = () => {
-      if (!auth) return;
-      const email = document.getElementById('input-auth-email').value.trim();
-      const errBox = document.getElementById('auth-error-box');
-
-      if (!email) {
-        errBox.textContent = 'Please enter your email address above, then click "Forgot password?".';
-        errBox.classList.remove('hidden');
-        return;
-      }
-
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          alert(`A password reset link has been sent to ${email}. Please check your inbox.`);
-        })
-        .catch((err) => {
-          errBox.textContent = getFriendlyAuthError(err.code, err.message);
-          errBox.classList.remove('hidden');
-        });
-    };
-
-    function getFriendlyAuthError(code, defaultMsg) {
-      switch (code) {
-        case 'auth/email-already-in-use':
-          return 'This email address is already registered. Please switch to "Sign In".';
-        case 'auth/invalid-email':
-          return 'Please enter a valid email address.';
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-          return 'Invalid email or password. Please verify your credentials.';
-        case 'auth/weak-password':
-          return 'Password must be at least 6 characters long.';
-        case 'auth/too-many-requests':
-          return 'Access temporarily blocked due to many failed attempts. Please try again later or reset password.';
-        default:
-          return defaultMsg;
-      }
-    }
-
-    // --- Shuffle & SRS Engines ---
+    // --- Shuffle & SRS Modes ---
     function generateShuffledIndices(length) {
       const arr = Array.from({ length }, (_, i) => i);
       for (let i = arr.length - 1; i > 0; i--) {
@@ -756,7 +619,6 @@
     function toggleShuffleMode() {
       const currentDeck = state.decks[state.currentDeckId];
       if (!currentDeck || currentDeck.questions.length === 0) return;
-
       const progress = getProgress();
       progress.isSRSMode = false;
       progress.isShuffled = !progress.isShuffled;
@@ -765,11 +627,10 @@
         progress.order = generateShuffledIndices(currentDeck.questions.length);
         progress.currentIndex = 0;
       } else {
-        const prevActualIndex = (progress.order && progress.order.length > 0) ? progress.order[progress.currentIndex] : progress.currentIndex;
-        progress.currentIndex = prevActualIndex || 0;
+        const prevActual = (progress.order && progress.order.length > 0) ? progress.order[progress.currentIndex] : progress.currentIndex;
+        progress.currentIndex = prevActual || 0;
         progress.order = [];
       }
-
       saveState();
     }
 
@@ -824,12 +685,12 @@
     }
 
     function saveState() {
-      localStorage.setItem('anesthesia_user_progress', JSON.stringify(state.userProgress));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.userProgress));
       render();
       pushStateToCloud();
     }
 
-    // --- UI Rendering ---
+    // --- Main UI Rendering ---
     function render() {
       lucide.createIcons();
       const currentDeck = state.currentDeckId ? state.decks[state.currentDeckId] : null;
@@ -866,7 +727,7 @@
       const pct = totalQ > 0 ? (answeredCount / totalQ) * 100 : 0;
       document.getElementById('progress-bar-fill').style.width = `${pct}%`;
 
-      // Update Accuracy
+      // Accuracy
       let correctCount = 0;
       Object.entries(progress.answers || {}).forEach(([idx, ans]) => {
         const item = currentDeck.questions[idx];
@@ -875,7 +736,7 @@
       const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
       document.getElementById('score-badge').textContent = `Accuracy: ${acc}%`;
 
-      // Update Shuffle & SRS Tags / Buttons
+      // Shuffle & SRS Buttons / Tags
       const shuffleBtn = document.getElementById('btn-shuffle');
       const shuffleTag = document.getElementById('shuffle-mode-tag');
       const srsBtn = document.getElementById('btn-srs-filter');
@@ -901,42 +762,46 @@
         document.getElementById('question-number-badge').textContent = `Question ${qPointer + 1} of ${totalQ}`;
       }
 
+      // Stem Text & Optional Stem Image
       document.getElementById('question-stem').textContent = q.stem;
+      const stemImgContainer = document.getElementById('stem-image-container');
+      const stemImg = document.getElementById('stem-image');
+      if (q.image) {
+        const cleanPath = q.image.startsWith('/') ? q.image.slice(1) : q.image;
+        stemImg.src = cleanPath;
+        stemImgContainer.classList.remove('hidden');
+      } else {
+        stemImgContainer.classList.add('hidden');
+      }
 
-      // Update Flag Status
+      // Flag state
       const isFlagged = (progress.flags || []).includes(actualIndex);
       const flagBtn = document.getElementById('btn-flag');
       flagBtn.className = isFlagged 
         ? 'p-2 text-amber-400 bg-amber-950/40 border border-amber-800/50 rounded-lg active:bg-slate-800 transition shrink-0' 
         : 'p-2 text-slate-400 hover:text-amber-400 rounded-lg active:bg-slate-800 transition shrink-0';
 
-      // Render Options
+      // Render Options (Key-Value Schema)
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
       const selectedAnswer = (progress.answers || {})[actualIndex];
 
-      q.options.forEach(opt => {
+      Object.entries(q.options || {}).forEach(([letter, text]) => {
         const btn = document.createElement('button');
         btn.className = `w-full text-left p-4 rounded-xl border font-medium text-sm transition flex items-start space-x-3 `;
-
         if (selectedAnswer) {
-          if (opt.letter === q.correctAnswer) {
-            btn.className += 'bg-emerald-950/40 border-emerald-500/80 text-emerald-200';
-          } else if (opt.letter === selectedAnswer) {
-            btn.className += 'bg-rose-950/40 border-rose-500/80 text-rose-200';
-          } else {
-            btn.className += 'bg-slate-900/50 border-slate-800/50 text-slate-500';
-          }
+          if (letter === q.correctAnswer) btn.className += 'bg-emerald-950/40 border-emerald-500/80 text-emerald-200';
+          else if (letter === selectedAnswer) btn.className += 'bg-rose-950/40 border-rose-500/80 text-rose-200';
+          else btn.className += 'bg-slate-900/50 border-slate-800/50 text-slate-500';
         } else {
           btn.className += 'bg-slate-900 border-slate-800 hover:border-slate-700 active:bg-slate-800 text-slate-200';
         }
-
-        btn.innerHTML = `<span class="font-bold px-2 py-0.5 rounded bg-slate-800 text-xs text-slate-300">${opt.letter}</span><span>${opt.text}</span>`;
-        btn.onclick = () => handleSelectOption(actualIndex, opt.letter);
+        btn.innerHTML = `<span class="font-bold px-2 py-0.5 rounded bg-slate-800 text-xs text-slate-300">${letter}</span><span>${text}</span>`;
+        btn.onclick = () => handleSelectOption(actualIndex, letter);
         optionsContainer.appendChild(btn);
       });
 
-      // Explanation Box
+      // Explanation & Reference Box
       const expBox = document.getElementById('explanation-box');
       const expImgContainer = document.getElementById('explanation-images-container');
 
@@ -944,20 +809,20 @@
         expBox.classList.remove('hidden');
         document.getElementById('explanation-content').innerHTML = `
           <div><b>Correct Answer:</b> Option ${q.correctAnswer}</div>
-          <div class="mt-1 text-slate-300">${formatMarkdown(q.explanation) || 'No rationale provided.'}</div>   
+          <div class="mt-1 text-slate-300">${formatMarkdown(q.explanation) || 'No rationale provided.'}</div>
         `;
 
-        // 🧠 Update SRS Status Tag
+        // Update SRS Status Tag
         const srsData = (progress.srs || {})[actualIndex];
-        const statusTag = document.getElementById('srs-status-tag');
-        if (statusTag) {
+        const srsTagStatus = document.getElementById('srs-status-tag');
+        if (srsTagStatus) {
           if (srsData && srsData.dueDate) {
             const daysLeft = Math.ceil((new Date(srsData.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
-            statusTag.textContent = daysLeft <= 0 ? 'Due for Review Today' : `Due in ${daysLeft}d (Interval: ${srsData.interval}d)`;
-            statusTag.className = daysLeft <= 0 ? 'text-[10px] text-amber-400 font-bold' : 'text-[10px] text-emerald-400 font-medium';
+            srsTagStatus.textContent = daysLeft <= 0 ? 'Due for Review Today' : `Due in ${daysLeft}d (Interval: ${srsData.interval}d)`;
+            srsTagStatus.className = daysLeft <= 0 ? 'text-[10px] text-amber-400 font-bold' : 'text-[10px] text-emerald-400 font-medium';
           } else {
-            statusTag.textContent = 'Not rated yet';
-            statusTag.className = 'text-[10px] text-slate-500';
+            srsTagStatus.textContent = 'Not rated yet';
+            srsTagStatus.className = 'text-[10px] text-slate-500';
           }
         }
 
@@ -978,7 +843,6 @@
       } else {
         expBox.classList.add('hidden');
       }
-
       lucide.createIcons();
     }
 
@@ -990,7 +854,7 @@
       saveState();
     }
 
-    // 🧠 Handle SRS Recall Ratings
+    // Handle SRS Recall Ratings
     window.rateRecall = (rating) => {
       const d = state.decks[state.currentDeckId];
       if (!d) return;
@@ -1003,17 +867,11 @@
       
       saveState();
     };
-   
-    // --- Deck Switcher Modal ---
+
     function renderDeckList() {
       const list = document.getElementById('deck-list');
       list.innerHTML = '';
-
       const deckKeys = Object.keys(state.decks);
-      if (deckKeys.length === 0) {
-        list.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">No question banks found. Please verify your script imports.</div>`;
-        return;
-      }
 
       deckKeys.forEach(id => {
         const deck = state.decks[id];
@@ -1030,9 +888,7 @@
 
         const item = document.createElement('div');
         item.className = `p-3.5 rounded-xl border flex items-center justify-between transition cursor-pointer ${
-          isCurrent 
-            ? 'bg-blue-600/15 border-blue-500/60 text-blue-200 shadow-sm' 
-            : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 text-slate-300'
+          isCurrent ? 'bg-blue-600/15 border-blue-500/60 text-blue-200' : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 text-slate-300'
         }`;
         
         item.innerHTML = `
@@ -1044,10 +900,7 @@
             </div>
           </div>
           <div class="shrink-0">
-            ${isCurrent 
-              ? `<span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 border border-blue-400/40 text-blue-300 rounded-md">Active</span>` 
-              : `<i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>`
-            }
+            ${isCurrent ? `<span class="px-2 py-0.5 text-[10px] font-bold uppercase bg-blue-500/20 border border-blue-400/40 text-blue-300 rounded-md">Active</span>` : `<i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>`}
           </div>
         `;
 
@@ -1056,93 +909,133 @@
           saveState();
           document.getElementById('modal-decks').classList.add('hidden');
         };
-
         list.appendChild(item);
       });
       lucide.createIcons();
     }
 
-    // --- Navigation & Control Events ---
+    // Navigation Events
     document.getElementById('btn-shuffle').onclick = () => toggleShuffleMode();
     document.getElementById('btn-srs-filter').onclick = () => toggleSRSMode();
 
     document.getElementById('btn-next').onclick = () => {
-      const p = getProgress();
-      const d = state.decks[state.currentDeckId];
+      const p = getProgress(), d = state.decks[state.currentDeckId];
       if (!p || !d) return;
       const maxLen = (p.order && p.order.length > 0) ? p.order.length : d.questions.length;
-      if (p.currentIndex < maxLen - 1) {
-        p.currentIndex++;
-        saveState();
+      if (p.currentIndex < maxLen - 1) { 
+        p.currentIndex++; 
+        saveState(); 
       }
     };
 
     document.getElementById('btn-prev').onclick = () => {
       const p = getProgress();
-      if (p && p.currentIndex > 0) {
-        p.currentIndex--;
-        saveState();
+      if (p && p.currentIndex > 0) { 
+        p.currentIndex--; 
+        saveState(); 
       }
     };
 
     document.getElementById('btn-reveal').onclick = () => {
-      const p = getProgress();
-      const d = state.decks[state.currentDeckId];
+      const p = getProgress(), d = state.decks[state.currentDeckId];
       if (p && d) {
-        const actualIndex = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
-        const q = d.questions[actualIndex];
-        handleSelectOption(actualIndex, q.correctAnswer || 'A');
+        const idx = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
+        handleSelectOption(idx, d.questions[idx].correctAnswer || 'A');
       }
     };
 
     document.getElementById('btn-flag').onclick = () => {
-      const p = getProgress();
-      const d = state.decks[state.currentDeckId];
+      const p = getProgress(), d = state.decks[state.currentDeckId];
       if (!p || !d) return;
-      
-      const actualIndex = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
+      const idx = (p.order && p.order.length > 0) ? p.order[p.currentIndex] : p.currentIndex;
       p.flags = p.flags || [];
-      const idx = p.flags.indexOf(actualIndex);
-      if (idx > -1) p.flags.splice(idx, 1);
-      else p.flags.push(actualIndex);
+      const pos = p.flags.indexOf(idx);
+      if (pos > -1) p.flags.splice(pos, 1); 
+      else p.flags.push(idx);
       saveState();
     };
 
-    // --- Modals & Auth Events ---
-    document.getElementById('btn-menu').onclick = () => {
-      renderDeckList();
-      document.getElementById('modal-decks').classList.remove('hidden');
+    // Modal Events
+    document.getElementById('btn-menu').onclick = () => { renderDeckList(); document.getElementById('modal-decks').classList.remove('hidden'); };
+    document.getElementById('btn-close-decks').onclick = () => document.getElementById('modal-decks').classList.add('hidden');
+    document.getElementById('btn-auth-modal').onclick = () => document.getElementById('modal-auth').classList.remove('hidden');
+    document.getElementById('btn-close-auth').onclick = () => document.getElementById('modal-auth').classList.add('hidden');
+
+    // Email Auth Handlers
+    document.getElementById('tab-auth-signin').onclick = () => setAuthMode('signin');
+    document.getElementById('tab-auth-signup').onclick = () => setAuthMode('signup');
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      const tabSignIn = document.getElementById('tab-auth-signin');
+      const tabSignUp = document.getElementById('tab-auth-signup');
+      const btnSubmit = document.getElementById('btn-email-submit');
+      const errBox = document.getElementById('auth-error-box');
+
+      errBox.classList.add('hidden');
+      if (mode === 'signin') {
+        tabSignIn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white';
+        tabSignUp.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200';
+        btnSubmit.textContent = 'Sign In';
+      } else {
+        tabSignUp.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white';
+        tabSignIn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg transition text-slate-400 hover:text-slate-200';
+        btnSubmit.textContent = 'Create Account';
+      }
+    }
+
+    document.getElementById('form-email-auth').onsubmit = (e) => {
+      e.preventDefault();
+      if (!auth) return;
+      const email = document.getElementById('input-auth-email').value.trim();
+      const password = document.getElementById('input-auth-password').value;
+      const errBox = document.getElementById('auth-error-box');
+      const btnSubmit = document.getElementById('btn-email-submit');
+
+      errBox.classList.add('hidden');
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Please wait...';
+
+      const p = authMode === 'signup' 
+        ? auth.createUserWithEmailAndPassword(email, password)
+        : auth.signInWithEmailAndPassword(email, password);
+
+      p.then(() => document.getElementById('modal-auth').classList.add('hidden'))
+       .catch((err) => { errBox.textContent = err.message; errBox.classList.remove('hidden'); })
+       .finally(() => { btnSubmit.disabled = false; btnSubmit.textContent = authMode === 'signup' ? 'Create Account' : 'Sign In'; });
     };
 
-    document.getElementById('btn-close-decks').onclick = () => {
-      document.getElementById('modal-decks').classList.add('hidden');
-    };
-
-    document.getElementById('btn-auth-modal').onclick = () => {
-      document.getElementById('modal-auth').classList.remove('hidden');
-    };
-
-    document.getElementById('btn-close-auth').onclick = () => {
-      document.getElementById('modal-auth').classList.add('hidden');
+    document.getElementById('btn-forgot-password').onclick = () => {
+      if (!auth) return;
+      const email = document.getElementById('input-auth-email').value.trim();
+      const errBox = document.getElementById('auth-error-box');
+      if (!email) {
+        errBox.textContent = 'Please enter your email above, then click forgot password.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+      auth.sendPasswordResetEmail(email).then(() => {
+        alert('A password reset link has been sent to your email.');
+      }).catch((err) => {
+        errBox.textContent = err.message;
+        errBox.classList.remove('hidden');
+      });
     };
 
     document.getElementById('btn-google-login').onclick = () => {
       if (!auth) return;
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => {
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => {
         document.getElementById('modal-auth').classList.add('hidden');
       }).catch((err) => {
-        const errBox = document.getElementById('auth-error-box');
-        errBox.textContent = getFriendlyAuthError(err.code, err.message);
-        errBox.classList.remove('hidden');
+        const box = document.getElementById('auth-error-box');
+        box.textContent = err.message;
+        box.classList.remove('hidden');
       });
     };
 
     document.getElementById('btn-logout').onclick = () => {
       if (!auth) return;
-      auth.signOut().then(() => {
-        document.getElementById('modal-auth').classList.add('hidden');
-      });
+      auth.signOut().then(() => document.getElementById('modal-auth').classList.add('hidden'));
     };
 
     // Initialize UI
