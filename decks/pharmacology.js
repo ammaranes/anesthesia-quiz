@@ -567,6 +567,7 @@ export const pharmacology = {
         C: "Inhalational induction",
         D: "Give ketamine and NDMR and cricoid pressure"
       },
+      {
       correctAnswer: "C",
       explanation: "Controlled **inhalational induction with spontaneous respiration** in the OR allows maintenance of airway patency and visualization without triggering total collapse."
     },
